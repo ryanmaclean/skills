@@ -25,18 +25,18 @@ Copy this checklist and check off as you go:
 Contradiction Analysis:
 - [ ] 1. State the contradiction: "improving X worsens Y"
 - [ ] 2. Map to TRIZ parameters — see [parameters.md](parameters.md)
-- [ ] 3. Run: scripts/solve.nu "X" "Y"
+- [ ] 3. Run: script/solve.nu "X" "Y"
 - [ ] 4. Review recommended principles — see [principles.md](principles.md)
 - [ ] 5. Apply: write the specific solution using the best principle
 - [ ] 6. Verify: does it actually resolve the tension without introducing a worse one?
 ```
 
 **Feedback loop:**
-- Contradiction unclear → run `scripts/whys.nu` first
+- Contradiction unclear → run `script/whys.nu` first
 - Parameter must be X AND not-X simultaneously → use [references/physical_contradictions.md](references/physical_contradictions.md) instead of the matrix
 - Empty matrix cell → reframe the parameters; see [references/examples.md](references/examples.md) for analogies
 - Principle doesn't fit the domain → try the next one in the recommendation list
-- None fit → run `scripts/fmea.nu PRINCIPLE_ID` to understand failure modes
+- None fit → run `script/fmea.nu PRINCIPLE_ID` to understand failure modes
 - Contradiction keeps recurring → check [references/evolution_trends.md](references/evolution_trends.md) — may be structural
 - Unsure how deep to search → check [references/innovation_levels.md](references/innovation_levels.md) first
 
@@ -44,15 +44,15 @@ Contradiction Analysis:
 
 | Script | Use |
 |--------|-----|
-| `scripts/solve.nu "X" "Y"` | Matrix lookup + principle application |
-| `scripts/solve.nu "X" "Y" -c "context"` | With situational context |
-| `scripts/solve.nu "X" "Y" --json` | Machine-readable output |
-| `scripts/whys.nu` | 5 Whys drill → articulate contradiction interactively |
-| `scripts/whys.nu --json` | Whys output with ready `solve_cmd` field |
-| `scripts/fmea.nu 35` | Failure mode analysis for principle 35 |
-| `scripts/fmea.nu --stdin` | Pipe from `solve.nu --json` |
-| `scripts/lookup.nu "speed"` | Find matching parameter by keyword |
-| `scripts/lookup.nu --principle 35` | Explain a principle |
+| `script/solve.nu "X" "Y"` | Matrix lookup + principle application |
+| `script/solve.nu "X" "Y" -c "context"` | With situational context |
+| `script/solve.nu "X" "Y" --json` | Machine-readable output |
+| `script/whys.nu` | 5 Whys drill → articulate contradiction interactively |
+| `script/whys.nu --json` | Whys output with ready `solve_cmd` field |
+| `script/fmea.nu 35` | Failure mode analysis for principle 35 |
+| `script/fmea.nu --stdin` | Pipe from `script/solve.nu --json` |
+| `script/lookup.nu "speed"` | Find matching parameter by keyword |
+| `script/lookup.nu --principle 35` | Explain a principle |
 
 Scripts are executable (`chmod +x`). Run from the skill directory or by full path.
 
