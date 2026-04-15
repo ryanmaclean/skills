@@ -28,14 +28,14 @@ ollama pull qwen3:32b   # one-time
 
 ```bash
 # Translate text to a target language
-nu /scripts/translate-translate.nu "Japanese" "technical-formal" "Your text here"
+nu scripts/translate.nu "Japanese" "technical-formal" "Your text here"
 
 # From a file
-nu /scripts/translate-translate.nu "Japanese" "technical-formal" \
+nu scripts/translate.nu "Japanese" "technical-formal" \
   --file /path/to/input.txt
 
 # Round-trip validation (EN -> JP -> EN)
-nu /scripts/translate-translate.nu "Japanese" "technical-formal" \
+nu scripts/translate.nu "Japanese" "technical-formal" \
   "Your text" --roundtrip
 ```
 
@@ -44,7 +44,7 @@ nu /scripts/translate-translate.nu "Japanese" "technical-formal" \
 ```
 Translation Progress:
 - [ ] 1. Choose target language and register (see registers table below)
-- [ ] 2. Run: nu /scripts/translate-translate.nu "Language" "register" "text"
+- [ ] 2. Run: nu scripts/translate.nu "Language" "register" "text"
 - [ ] 3. Verify: does output read naturally? Check for register flattening.
 - [ ] 4. For critical text: run --roundtrip and compare back-translation
 - [ ] 5. For legal/published copy: use Qwen-MT API instead (see cjk.md)

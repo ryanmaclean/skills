@@ -17,10 +17,10 @@ or connecting the triz tool to Japanese management philosophy.
 
 | Script | Use |
 |--------|-----|
-| `/scripts/toyota-postmortem.nu "Incident Title"` | Blameless postmortem with 5 Whys + triz integration |
-| `/scripts/toyota-postmortem.nu "Title" --save file.md` | Write postmortem to file |
-| `/scripts/toyota-a3.nu "Problem Title"` | A3 one-page problem clarity template |
-| `/scripts/toyota-a3.nu "Title" --save file.md` | Write A3 to file |
+| `scripts/postmortem.nu "Incident Title"` | Blameless postmortem with 5 Whys + triz integration |
+| `scripts/postmortem.nu "Title" --save file.md` | Write postmortem to file |
+| `scripts/a3.nu "Problem Title"` | A3 one-page problem clarity template |
+| `scripts/a3.nu "Title" --save file.md` | Write A3 to file |
 
 Both scripts print a structured markdown template to stdout. Fill in bracketed fields.
 Both embed a `triz solve` invocation in the root cause section — run it if a contradiction emerges.
