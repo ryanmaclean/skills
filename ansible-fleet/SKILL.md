@@ -108,7 +108,7 @@ ansible <hosts> -i inventory -b -m systemd -a "name=<service> state=started enab
 ## Reference Files
 
 ```
-$HOME/rust-town/irclaw/ansible/
+~/ansible/
 ├── inventory              # Fleet inventory
 ├── 01-datadog.yml         # Datadog deployment
 ├── 02-ollama.yml          # Ollama deployment  

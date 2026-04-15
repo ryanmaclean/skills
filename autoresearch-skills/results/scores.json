@@ -1,0 +1,524 @@
+[
+  {
+    "timestamp": "2026-04-14T23:38:58.336033",
+    "skill": "ansible-fleet",
+    "variant": "current",
+    "pass_rate": 0.0,
+    "passed": 0,
+    "total": 0,
+    "improvement": 0.0
+  },
+  {
+    "timestamp": "2026-04-14T23:55:07.178835",
+    "skill": "ansible-fleet",
+    "variant": "current",
+    "pass_rate": 0.0,
+    "passed": 0,
+    "total": 0,
+    "improvement": 0.0
+  },
+  {
+    "timestamp": "2026-04-14T23:55:14.884576",
+    "skill": "ansible-fleet",
+    "variant": "structure_235511",
+    "pass_rate": 0.0,
+    "passed": 0,
+    "total": 0,
+    "improvement": 0.0
+  },
+  {
+    "timestamp": "2026-04-14T23:55:49.458498",
+    "skill": "ansible-fleet",
+    "variant": "current",
+    "pass_rate": 0.0,
+    "passed": 0,
+    "total": 0,
+    "improvement": 0.0
+  },
+  {
+    "timestamp": "2026-04-14T23:56:03.831793",
+    "skill": "ansible-fleet",
+    "variant": "current",
+    "pass_rate": 0.0,
+    "passed": 0,
+    "total": 0,
+    "improvement": 0.0
+  },
+  {
+    "timestamp": "2026-04-14T23:56:16.020074",
+    "skill": "ansible-fleet",
+    "variant": "current",
+    "pass_rate": 0.0,
+    "passed": 0,
+    "total": 0,
+    "improvement": 0.0
+  },
+  {
+    "timestamp": "2026-04-14T23:56:56.065090",
+    "skill": "ansible-fleet",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 3,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-14T23:57:15.372794",
+    "skill": "ollama-deploy",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 3,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-14T23:57:30.857212",
+    "skill": "raspberry-pi",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 3,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-14T23:57:56.261230",
+    "skill": "elixir-gastown-ops",
+    "variant": "current",
+    "pass_rate": 0.0,
+    "passed": 0,
+    "total": 0,
+    "improvement": 0.0
+  },
+  {
+    "timestamp": "2026-04-14T23:58:33.919248",
+    "skill": "elixir-gastown-ops",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 3,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-14T23:58:51.487491",
+    "skill": "irclaw-cluster-ops",
+    "variant": "current",
+    "pass_rate": 0.0,
+    "passed": 0,
+    "total": 0,
+    "improvement": 0.0
+  },
+  {
+    "timestamp": "2026-04-14T23:59:05.393051",
+    "skill": "irclaw-cluster-ops",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 3,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-14T23:59:37.550161",
+    "skill": "zellij",
+    "variant": "current",
+    "pass_rate": 0.0,
+    "passed": 0,
+    "total": 0,
+    "improvement": 0.0
+  },
+  {
+    "timestamp": "2026-04-15T00:00:03.559352",
+    "skill": "zellij",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 3,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:00:24.758575",
+    "skill": "datadog-backup",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 2,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:00:41.406510",
+    "skill": "ac-list",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 2,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:01:02.378067",
+    "skill": "dispatch-nu",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 2,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:01:34.779852",
+    "skill": "autoresearch",
+    "variant": "current",
+    "pass_rate": 0.0,
+    "passed": 0,
+    "total": 0,
+    "improvement": 0.0
+  },
+  {
+    "timestamp": "2026-04-15T00:01:48.944236",
+    "skill": "autoresearch",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 3,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:14:23.238427",
+    "skill": "a-team",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 2,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:14:28.666225",
+    "skill": "ac-ideate",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:14:41.186905",
+    "skill": "ac-roadmap",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:14:46.924849",
+    "skill": "fleet-irc",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:14:50.858448",
+    "skill": "gantt",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:14:57.500609",
+    "skill": "jj",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:15:04.564846",
+    "skill": "leptos",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:15:10.403431",
+    "skill": "preflight",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:15:15.616586",
+    "skill": "providers",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:15:21.687943",
+    "skill": "quota-gate",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:15:35.178286",
+    "skill": "redact",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:15:41.694845",
+    "skill": "searxng",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:15:49.308354",
+    "skill": "translate",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:15:55.692680",
+    "skill": "unicode-glyphs",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:16:01.722415",
+    "skill": "bop-brainstorm",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:16:17.242115",
+    "skill": "bop-on",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:16:24.431450",
+    "skill": "bop-team",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:16:28.968731",
+    "skill": "bop-workflow",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:16:36.823214",
+    "skill": "council",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:16:44.074091",
+    "skill": "tiger-team",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:16:49.649475",
+    "skill": "jobcard-system",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:16:57.451255",
+    "skill": "irclaw-research-team",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:17:01.752398",
+    "skill": "toyota-way",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:17:13.082366",
+    "skill": "triz",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:17:19.659412",
+    "skill": "ultraplan",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:17:26.844855",
+    "skill": "vibekanban",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:17:34.459482",
+    "skill": "zellij-team",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:17:41.945188",
+    "skill": "zfs",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:17:49.706735",
+    "skill": "agent-skills",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:17:58.491476",
+    "skill": "apfs",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:18:06.114583",
+    "skill": "at-tui",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:18:45.501933",
+    "skill": "agent-skills-dd-apm",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:18:54.235108",
+    "skill": "agent-skills-dd-logs",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:19:02.879946",
+    "skill": "agent-skills-dd-monitors",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:19:15.130641",
+    "skill": "agent-skills-dd-pup",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:19:18.335646",
+    "skill": "agent-skills-dd-docs",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:19:21.848087",
+    "skill": "agent-skills-dd-llmo-experiment-analyzer",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:19:28.220633",
+    "skill": "agent-skills-dd-llmo-experiment-analyzer-comparative",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 1,
+    "total": 0,
+    "improvement": 100.0
+  }
+]

@@ -7,7 +7,7 @@ description: Use when communicating with fleet agents, checking agent status, or
 
 ## Access
 
-IRC server: `10.0.3.203` (zeroclaw macvlan container on QNAS 10.0.2.35), TLS
+IRC server: `10.0.3.203` (irclaw macvlan container on QNAS 10.0.2.35), TLS
 Nick to use: `ryan`
 Primary channel: `#agents`
 
@@ -31,7 +31,7 @@ echo -e "NICK ryan\r\nUSER ryan 0 * :ryan\r\nJOIN #agents\r\nPRIVMSG #agents :me
 ssh ubuntu@10.0.3.203 "echo 'PRIVMSG #agents :your message here' | \
   openssl s_client -connect 127.0.0.1:6697 -quiet 2>/dev/null" &
 
-# DM a specific agent (e.g. zeroclaw bot named "ztudio")
+# DM a specific agent (e.g. irclaw bot named "ztudio")
 ssh ubuntu@10.0.3.203 "echo 'PRIVMSG ztudio :run status' | \
   openssl s_client -connect 127.0.0.1:6697 -quiet 2>/dev/null" &
 ```
@@ -51,7 +51,7 @@ ansible -i inventory irc-host -m shell -a 'irssi --connect=...'
 ## Agent Names in #agents
 
 Agents announce themselves on join. Common names:
-- zeroclaw bots: usually match hostname (e.g. `ubrpi407-zclaw`)
+- irclaw bots: usually match hostname (e.g. `ubrpi407-zclaw`)
 - Coordinator agents: `i9-agent`, `i7-agent`
 
 ## Use Cases

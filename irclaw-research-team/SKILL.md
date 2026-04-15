@@ -120,6 +120,6 @@ ansible-playbook -i ansible/inventory ansible/sync-skills.yml
 ## Key Constraints
 
 - **liteparse needs a local file** — always curl first
-- **zeroclaw is private** — skip `github.com/zeroclaw-labs/irclaw`, use local ansible playbooks for context
+- **irclaw is private** — skip `github.com/irclaw-labs/irclaw`, use local ansible playbooks for context
 - **Ollama port** — always `localhost:11434`, not a fleet-wide coordinator
 - **ARM64 nodes** — liteparse runs fine via npx on aarch64; no binary issues

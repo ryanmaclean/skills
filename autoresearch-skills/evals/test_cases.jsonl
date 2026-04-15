@@ -1,0 +1,66 @@
+{"id": "tc_001", "skill": "ansible-fleet", "input": "How do I deploy software to multiple Raspberry Pis using Ansible?", "metadata": {"category": "deployment", "complexity": "basic"}}
+{"id": "tc_002", "skill": "ansible-fleet", "input": "What's the best way to handle different architectures (ARM64 vs AMD64) in Ansible playbooks?", "metadata": {"category": "architecture", "complexity": "intermediate"}}
+{"id": "tc_003", "skill": "ansible-fleet", "input": "My Ansible playbook keeps timing out when downloading large files. How do I fix this?", "metadata": {"category": "troubleshooting", "complexity": "advanced"}}
+{"id": "tc_004", "skill": "ollama-deploy", "input": "Deploy Ollama on a Raspberry Pi 4 with ARM64 architecture", "metadata": {"category": "deployment", "complexity": "basic"}}
+{"id": "tc_005", "skill": "ollama-deploy", "input": "How do I pull specific models like kimi-k2.5:cloud after installing Ollama?", "metadata": {"category": "configuration", "complexity": "intermediate"}}
+{"id": "tc_006", "skill": "ollama-deploy", "input": "Ollama service won't start after installation. What should I check?", "metadata": {"category": "troubleshooting", "complexity": "advanced"}}
+{"id": "tc_007", "skill": "raspberry-pi", "input": "What's different about managing Raspberry Pis compared to regular Linux servers?", "metadata": {"category": "overview", "complexity": "basic"}}
+{"id": "tc_008", "skill": "raspberry-pi", "input": "How do I safely upgrade Ubuntu from 20.04 to 22.04 on a Pi without breaking SSH?", "metadata": {"category": "maintenance", "complexity": "advanced"}}
+{"id": "tc_009", "skill": "raspberry-pi", "input": "Python 3.8 is too old for Ansible on my Pi. How do I upgrade Python?", "metadata": {"category": "dependencies", "complexity": "intermediate"}}
+{"id": "tc_010", "skill": "elixir-gastown-ops", "input": "How do I check if all Elixir nodes in the cluster are connected?", "metadata": {"category": "monitoring", "complexity": "basic"}}
+{"id": "tc_011", "skill": "elixir-gastown-ops", "input": "My BEAM nodes keep disconnecting from each other. What's wrong?", "metadata": {"category": "troubleshooting", "complexity": "advanced"}}
+{"id": "tc_012", "skill": "elixir-gastown-ops", "input": "How do I deploy a new version of gastown to all Pis in the fleet?", "metadata": {"category": "deployment", "complexity": "intermediate"}}
+{"id": "tc_013", "skill": "irclaw-cluster-ops", "input": "How do I send commands to IRC bots on the fleet?", "metadata": {"category": "communication", "complexity": "basic"}}
+{"id": "tc_014", "skill": "irclaw-cluster-ops", "input": "What commands are blocked by the bot security policy?", "metadata": {"category": "security", "complexity": "intermediate"}}
+{"id": "tc_015", "skill": "irclaw-cluster-ops", "input": "Long-running ansible deployments keep getting killed. How do I fix this?", "metadata": {"category": "troubleshooting", "complexity": "advanced"}}
+{"id": "tc_016", "skill": "datadog-backup", "input": "How do I backup all my skills to Datadog notebooks?", "metadata": {"category": "backup", "complexity": "basic"}}
+{"id": "tc_017", "skill": "datadog-backup", "input": "Restore a skill from a Datadog notebook backup", "metadata": {"category": "restore", "complexity": "intermediate"}}
+{"id": "tc_018", "skill": "zellij", "input": "How do I create a Zellij session with multiple panes?", "metadata": {"category": "session-management", "complexity": "basic"}}
+{"id": "tc_019", "skill": "zellij", "input": "What's the right way to get the current session name in a script?", "metadata": {"category": "scripting", "complexity": "intermediate"}}
+{"id": "tc_020", "skill": "zellij", "input": "My Zellij session keeps crashing when I run long commands. Why?", "metadata": {"category": "troubleshooting", "complexity": "advanced"}}
+{"id": "tc_021", "skill": "ac-list", "input": "Check the status of all specs in my current project", "metadata": {"category": "status-check", "complexity": "basic"}}
+{"id": "tc_022", "skill": "ac-list", "input": "Show only the pending/failed specs from the kanban board", "metadata": {"category": "filtering", "complexity": "intermediate"}}
+{"id": "tc_023", "skill": "dispatch-nu", "input": "How do I run a specific wave of specs in the dispatcher?", "metadata": {"category": "execution", "complexity": "basic"}}
+{"id": "tc_024", "skill": "dispatch-nu", "input": "Set up a dispatcher for a new project with Auto-Claude integration", "metadata": {"category": "setup", "complexity": "intermediate"}}
+{"id": "tc_025", "skill": "autoresearch", "input": "Set up an autonomous improvement loop for my API response times", "metadata": {"category": "setup", "complexity": "basic"}}
+{"id": "tc_026", "skill": "autoresearch", "input": "Run a security audit using the autoresearch pattern", "metadata": {"category": "security", "complexity": "advanced"}}
+{"id": "tc_027", "skill": "autoresearch", "input": "How do I define good metrics for an autoresearch loop?", "metadata": {"category": "metrics", "complexity": "intermediate"}}
+{"id": "tc_028", "skill": "a-team", "input": "Set up a team of PM, engineer, and security specialist for a new feature", "metadata": {"category": "team-setup", "complexity": "basic"}}
+{"id": "tc_029", "skill": "a-team", "input": "Coordinate a multi-deliverable project with parallel specialist execution", "metadata": {"category": "coordination", "complexity": "advanced"}}
+{"id": "tc_030", "skill": "ac-ideate", "input": "Generate low-hanging fruit feature ideas for my current project", "metadata": {"category": "ideation", "complexity": "basic"}}
+{"id": "tc_031", "skill": "ac-roadmap", "input": "Create a strategic feature roadmap for my project", "metadata": {"category": "roadmap", "complexity": "intermediate"}}
+{"id": "tc_032", "skill": "fleet-irc", "input": "How do I send a command to a specific IRC bot on the fleet?", "metadata": {"category": "communication", "complexity": "basic"}}
+{"id": "tc_033", "skill": "gantt", "input": "Generate a Gantt timeline showing parallelism of recent bop card runs", "metadata": {"category": "visualization", "complexity": "intermediate"}}
+{"id": "tc_034", "skill": "jj", "input": "How do I use jj for version control instead of git?", "metadata": {"category": "basics", "complexity": "basic"}}
+{"id": "tc_035", "skill": "leptos", "input": "Build a Leptos WASM app with shadcn/ui components", "metadata": {"category": "development", "complexity": "intermediate"}}
+{"id": "tc_036", "skill": "preflight", "input": "Check if I have enough quota to dispatch a new wave of specs", "metadata": {"category": "quota-check", "complexity": "basic"}}
+{"id": "tc_037", "skill": "providers", "input": "Check current quota utilization across all AI providers", "metadata": {"category": "quota", "complexity": "basic"}}
+{"id": "tc_038", "skill": "quota-gate", "input": "Should I dispatch this wave? Check available headroom", "metadata": {"category": "quota-check", "complexity": "basic"}}
+{"id": "tc_039", "skill": "redact", "input": "Redact a sensitive API key from a log file", "metadata": {"category": "security", "complexity": "basic"}}
+{"id": "tc_040", "skill": "searxng", "input": "Search for information when WebSearch is rate-limited", "metadata": {"category": "search", "complexity": "basic"}}
+{"id": "tc_041", "skill": "translate", "input": "Translate text to Japanese using local Ollama", "metadata": {"category": "translation", "complexity": "basic"}}
+{"id": "tc_042", "skill": "unicode-glyphs", "input": "Choose a Unicode symbol for a card identity token", "metadata": {"category": "symbols", "complexity": "basic"}}
+{"id": "tc_043", "skill": "bop-brainstorm", "input": "Brainstorm ideas for improving the bop jobcard system", "metadata": {"category": "ideation", "complexity": "basic"}}
+{"id": "tc_044", "skill": "bop-on", "input": "Apply the O(N) design rule to a bop loop to avoid performance issues", "metadata": {"category": "performance", "complexity": "intermediate"}}
+{"id": "tc_045", "skill": "bop-team", "input": "Execute a bop card through the dispatcher workflow", "metadata": {"category": "workflow", "complexity": "basic"}}
+{"id": "tc_046", "skill": "bop-workflow", "input": "Understand the complete bop card lifecycle from dispatch to completion", "metadata": {"category": "workflow", "complexity": "intermediate"}}
+{"id": "tc_047", "skill": "council", "input": "Get multiple expert opinions on a complex architecture decision", "metadata": {"category": "decision-making", "complexity": "advanced"}}
+{"id": "tc_048", "skill": "tiger-team", "input": "Stress-test a security design using adversarial expert personas", "metadata": {"category": "security", "complexity": "advanced"}}
+{"id": "tc_049", "skill": "jobcard-system", "input": "Understand how the jobcard system manages card lifecycle", "metadata": {"category": "system", "complexity": "basic"}}
+{"id": "tc_050", "skill": "irclaw-research-team", "input": "Coordinate research tasks across IRC-connected agents", "metadata": {"category": "coordination", "complexity": "intermediate"}}
+{"id": "tc_051", "skill": "toyota-way", "input": "Apply Toyota Production System principles to software development", "metadata": {"category": "methodology", "complexity": "intermediate"}}
+{"id": "tc_052", "skill": "triz", "input": "Resolve a contradiction between speed and correctness using TRIZ", "metadata": {"category": "problem-solving", "complexity": "intermediate"}}
+{"id": "tc_053", "skill": "ultraplan", "input": "Create an implementation plan using 4 specialist agents", "metadata": {"category": "planning", "complexity": "advanced"}}
+{"id": "tc_054", "skill": "vibekanban", "input": "Navigate the visual card UI and Quick Look previews", "metadata": {"category": "ui", "complexity": "basic"}}
+{"id": "tc_055", "skill": "zellij-team", "input": "Spawn parallel Claude agents in Zellij panes", "metadata": {"category": "agent-management", "complexity": "intermediate"}}
+{"id": "tc_056", "skill": "zfs", "input": "Use ZFS clone for space-efficient build sandboxes on macOS", "metadata": {"category": "storage", "complexity": "intermediate"}}
+{"id": "tc_057", "skill": "agent-skills", "input": "Understand the agent-skills framework structure", "metadata": {"category": "framework", "complexity": "basic"}}
+{"id": "tc_058", "skill": "agent-skills-dd-apm", "input": "Query Datadog APM for application performance metrics", "metadata": {"category": "monitoring", "complexity": "intermediate"}}
+{"id": "tc_059", "skill": "agent-skills-dd-logs", "input": "Search Datadog logs for error patterns", "metadata": {"category": "logging", "complexity": "intermediate"}}
+{"id": "tc_060", "skill": "apfs", "input": "Use APFS clonefile for space-efficient file copying on macOS", "metadata": {"category": "storage", "complexity": "basic"}}
+{"id": "tc_061", "skill": "agent-skills-dd-monitors", "input": "Create a Datadog monitor for error rate alerts", "metadata": {"category": "monitoring", "complexity": "intermediate"}}
+{"id": "tc_062", "skill": "agent-skills-dd-pup", "input": "Use Datadog CLI for OAuth2 authentication", "metadata": {"category": "authentication", "complexity": "basic"}}
+{"id": "tc_063", "skill": "at-tui", "input": "Inspect project state and navigate tabs in the AT TUI", "metadata": {"category": "interface", "complexity": "intermediate"}}
+{"id": "tc_064", "skill": "agent-skills-dd-docs", "input": "Query Datadog documentation for API usage", "metadata": {"category": "documentation", "complexity": "basic"}}
+{"id": "tc_065", "skill": "agent-skills-dd-llmo-experiment-analyzer", "input": "Analyze LLM experiment results and compare performance", "metadata": {"category": "analysis", "complexity": "intermediate"}}
+{"id": "tc_066", "skill": "agent-skills-dd-llmo-experiment-analyzer-comparative", "input": "Compare multiple LLM experiments side by side", "metadata": {"category": "comparison", "complexity": "advanced"}}

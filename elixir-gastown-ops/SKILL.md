@@ -122,15 +122,15 @@ ubrpi501 uses `ansible_user=string`.
 
 HTTP endpoint on i9: `GET http://<i9-ip>:4000/api/llm-permit` → `{"ok":true,"wait_ms":N}`
 Release endpoint: `POST http://<i9-ip>:4000/api/llm-release`
-Zeroclaw config on Pis: `/etc/gastown-worker.env` → zeroclaw `config.toml` has `pre_request_url`.
-Deploy zeroclaw rate limit config: `ansible-playbook -i inventory ansible/23-zeroclaw-rate-limit.yml`
+Zeroclaw config on Pis: `/etc/gastown-worker.env` → irclaw `config.toml` has `pre_request_url`.
+Deploy irclaw rate limit config: `ansible-playbook -i inventory ansible/23-irclaw-rate-limit.yml`
 
 ## Key Playbooks
 
 | Playbook | Purpose |
 |----------|---------|
 | `22-gastown-pis.yml` | Build on ubrpi502 + deploy to all Pis |
-| `23-zeroclaw-rate-limit.yml` | Set pre/post_request_url on Pi zeroclaw configs |
+| `23-irclaw-rate-limit.yml` | Set pre/post_request_url on Pi irclaw configs |
 | `24-dd-fix-gastown-pis.yml` | Fix DD tags, process check, DogStatsD on Pis |
 
 ## Hostnames vs Node Names

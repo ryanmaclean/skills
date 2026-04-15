@@ -1,0 +1,63 @@
+name: secure-deployment
+description: Security-first deployment pipeline with mandatory checks
+
+intent:
+  action: "deploy software"
+  scope: "fleet deployment"
+  priority: "critical"
+  target_hosts: "pis"
+
+dependencies:
+  # Mandatory security audit
+  - skill: autoresearch:security
+    required: true
+    on_missing: "error"
+    context_transfer: ["security_findings", "risk_level", "scan_duration"]
+    
+  # Pre-deployment system check
+  - skill: ansible-fleet
+    required: true
+    condition: "security_findings.critical == 0"
+    on_missing: "error"
+    context_transfer: ["target_hosts", "playbook_ready", "architecture_compatible"]
+    context_from:
+      security: ["target_hosts", "security_recommendations"]
+    
+  # Optional quota check for cloud resources
+  - skill: quota-gate
+    required: false
+    on_missing: "warn"
+    condition: "deployment_type == 'cloud'"
+    context_transfer: ["provider_headroom", "cost_estimate"]
+
+execution:
+  mode: "gate"  # Block if critical dependencies fail
+  context_disclosure: "full"  # Share all context for security
+  fail_fast: true  # Stop immediately on critical failures
+
+context_flow:
+  level_0:
+    - intent.action
+    - intent.scope
+    - intent.target_hosts
+    
+  level_1:
+    - security_scan_available
+    - ansible_available
+    
+  level_2:
+    - security_findings
+    - deployment_readiness
+    
+  level_3:
+    - deployment_plan
+    - rollback_strategy
+
+fallbacks:
+  critical_security_issues:
+    action: "block_deployment"
+    message: "Critical security issues found - deployment blocked"
+    
+  ansible_not_ready:
+    action: "prepare_ansible_first"
+    message: "Ansible not ready - running preparation steps"

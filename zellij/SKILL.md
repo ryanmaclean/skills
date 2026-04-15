@@ -252,3 +252,33 @@ Created via `zellij action new-tab --name card-<id>`, then pane splits via
 | zam | `zam` | `layouts/zam.kdl` |
 
 These are current names — they WILL change. Always use `$ZELLIJ_SESSION_NAME`.
+
+## Quick reference
+
+```bash
+# Get current session name (canonical method)
+SESSION=${ZELLIJ_SESSION_NAME:-$(zellij list-sessions --no-formatting | head -1 | awk '{print $1}')}
+
+# Start/attach to session
+zellij attach --create <session-name>
+
+# List sessions
+zellij list-sessions --no-formatting
+
+# Run command in new pane
+zellij --session $SESSION run --name pane-name --close-on-exit -- command
+
+# Detach without killing
+Ctrl+p d
+
+# Navigate between panes
+Alt + arrow keys
+```
+
+## Common mistakes
+
+- **Hardcoding session names**: Never write literal names like "bop" or "efi" — always read `$ZELLIJ_SESSION_NAME`
+- **Using Ctrl+O in TUI apps**: Zellij intercepts this key for Session mode — use bare printable keys like `!` instead
+- **Not using full paths to binaries**: `nu` and other tools are not in PATH inside spawned panes — use full paths like `/opt/homebrew/bin/nu`
+- **Forgetting --close-on-exit**: Worker panes should close when done to avoid resource leaks
+- **Using Ctrl+O for subshell drop**: Use bare `!` key instead, as Ctrl+O is intercepted by Zellij

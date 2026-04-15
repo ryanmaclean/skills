@@ -1,0 +1,76 @@
+name: smart-dispatch
+description: Intelligent task dispatch with quota awareness and fallback providers
+
+# User intent (Level 0 context)
+intent:
+  action: "dispatch tasks"
+  scope: "multi-agent coordination"
+  priority: "high"
+  estimated_tasks: 5
+
+# Dependencies with conditional execution
+dependencies:
+  # Primary quota check
+  - skill: preflight
+    required: false
+    alternative: quota-gate
+    on_missing: "warn"
+    context_transfer: ["quota_status", "recommended_provider", "task_capacity"]
+    
+  # Security check (optional but recommended)
+  - skill: autoresearch:security
+    required: false
+    on_missing: "warn"
+    condition: "recommended_provider != 'ollama'"  # Skip for local Ollama
+    context_transfer: ["security_findings", "risk_level"]
+    
+  # Core dispatch capability
+  - skill: dispatch-nu
+    required: true
+    condition: "quota_status != 'blocked'"
+    context_from:
+      preflight: ["recommended_provider", "task_capacity"]
+      quota-gate: ["provider_headroom", "recommendation"]
+      security: ["target_hosts"]  # Only if security ran
+
+# Execution configuration
+execution:
+  mode: "sequential"  # Run dependencies in order
+  context_disclosure: "progressive"  # Disclose context gradually
+  fail_fast: false  # Continue even if optional dependencies fail
+  
+# Context flow rules
+context_flow:
+  level_0:  # User intent
+    - intent.action
+    - intent.scope
+    - intent.priority
+    
+  level_1:  # Available capabilities
+    - available_skills
+    - missing_skills
+    - alternatives
+    
+  level_2:  # Dependency results
+    - quota_status
+    - recommended_provider
+    - security_findings
+    
+  level_3:  # Execution decisions
+    - chosen_provider
+    - routing_strategy
+    - cost_estimate
+
+# Fallback strategies
+fallbacks:
+  quota_check_blocked:
+    action: "use_local_ollama"
+    message: "Quota blocked - switching to local Ollama"
+    
+  security_high_risk:
+    action: "require_manual_approval"
+    message: "High security risk - manual approval required"
+    
+  dispatch_unavailable:
+    action: "direct_execution"
+    message: "Dispatcher unavailable - executing directly"
