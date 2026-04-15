@@ -1,0 +1,501 @@
+#!/usr/bin/env nu
+# dispatch.codex.nu — TRIZ hybrid dispatcher (Codex + Auto-Claude)
+#
+# Ported from dub/dispatch.codex.nu pattern.
+# Routes specs to either Codex CLI or Auto-Claude based on `agent` field.
+# Uses Ollama cloud for pre-planning before each spec.
+#
+# Usage:
+#   nu dispatch.codex.nu plan              # show full wave plan
+#   nu dispatch.codex.nu run --wave 1      # run wave 1
+#   nu dispatch.codex.nu status            # check progress
+#   nu dispatch.codex.nu pre-plan          # queue all specs through Ollama now
+#   nu dispatch.codex.nu mark-done 011     # called by pane on success
+#   nu dispatch.codex.nu mark-failed 011   # called by pane on failure
+#   nu dispatch.codex.nu reset --spec 011  # clear spec state
+#   nu dispatch.codex.nu retry             # re-queue all failed specs
+
+const PROJECT_DIR = ($env.PROJECT_DIR? | default $"($env.HOME)/project")
+const STATE_DIR   = $"($PROJECT_DIR)/.codex"
+const STATE_FILE  = $"($PROJECT_DIR)/.codex/dispatch-state.json"
+const LOCK_FILE   = $"($PROJECT_DIR)/.codex/dispatch-lock.json"
+const SPECS_DIR   = $"($PROJECT_DIR)/.auto-claude/specs"
+const SIGNAL_DIR  = "/tmp"
+
+const AC_PYTHON = "/Applications/Auto-Claude.app/Contents/Resources/python/bin/python3"
+const AC_RUNNER = "/Applications/Auto-Claude.app/Contents/Resources/backend/run.py"
+const AC_PYPATH = "/Applications/Auto-Claude.app/Contents/Resources/backend:/Applications/Auto-Claude.app/Contents/Resources/python-site-packages"
+
+const OLLAMA_URL  = "http://localhost:11434/api/chat"
+const PLAN_MODEL  = "qwen3-coder:480b-cloud"
+const PLAN_MODEL_FALLBACK = "qwen3-coder:30b"
+const CODEX_MODEL = "gpt-5.3-codex"
+
+# ---------------------------------------------------------------------------
+# Spec table
+# wave:  dependency wave (higher = later)
+# cost:  1=trivial 2=small 3=medium 4=complex (drives cooldown)
+# agent: "codex" = Codex CLI, "ac" = Auto-Claude run.py
+# mode:  "direct" = write to repo, "isolated" = worktree (needs merge)
+# ---------------------------------------------------------------------------
+def specs [] { [
+  [id,    name,                       wave, cost, agent,    mode      ];
+  # Wave 1: 001+002 done — start here
+  ["011", "core-commands",               1,    3, "codex",  "direct"  ]
+
+  # Wave 2: after 011
+  ["003", "rust-solve-cmd",              2,    4, "ac",     "isolated"]
+  ["017", "distribution",               2,    2, "codex",  "direct"  ]
+
+  # Wave 3: after 003 — parallel burst
+  ["016", "whys",                        3,    2, "ac",     "direct"  ]
+  ["018", "matrix-cmd",                  3,    3, "codex",  "direct"  ]
+  ["019", "relate-cmd",                  3,    3, "codex",  "direct"  ]
+  ["005", "corpus",                      3,    3, "ac",     "isolated"]
+
+  # Wave 4: after wave 3
+  ["020", "vscode-extension",            4,    3, "codex",  "direct"  ]
+  ["014", "eval",                        4,    3, "ac",     "isolated"]
+
+  # Wave 5: after 014
+  ["004", "nu-council",                  5,    4, "ac",     "isolated"]
+
+  # Wave 6: after 004
+  ["006", "mcp-server",                  6,    4, "ac",     "isolated"]
+
+  # Wave 7: after 006 (parallel)
+  ["007", "council-spawn",               7,    3, "ac",     "isolated"]
+  ["009", "fmea",                        7,    3, "ac",     "isolated"]
+
+  # Wave 8: after 005+009 (parallel)
+  ["013", "semantic-corpus",             8,    4, "ac",     "isolated"]
+  ["012", "local-inference",             8,    4, "ac",     "isolated"]
+
+  # Wave 9: after 013+012
+  ["008", "tui",                         9,    4, "ac",     "isolated"]
+]}
+
+def cooldown [cost: int] {
+  match $cost { 1 => 15, 2 => 30, 3 => 60, 4 => 90, _ => 45 }
+}
+
+# ---------------------------------------------------------------------------
+# State
+# ---------------------------------------------------------------------------
+def ensure_dirs [] {
+  if not ($STATE_DIR | path exists) { mkdir $STATE_DIR }
+}
+
+def load_state [] {
+  ensure_dirs
+  if ($STATE_FILE | path exists) {
+    open $STATE_FILE
+  } else {
+    # Seed 001+002 as already done
+    {completed: ["001", "002"], failed: [], skipped: []}
+  }
+}
+
+def save_state [state: record] {
+  ensure_dirs
+  $state | to json --indent 2 | save --force $STATE_FILE
+}
+
+def do_mark_done [spec_id: string] {
+  let s = load_state
+  let s2 = $s | update completed ($s.completed | append $spec_id | uniq)
+  save_state $s2
+  # Emit signal file for backward compat with codex-watcher
+  touch $"($SIGNAL_DIR)/triz-done-($spec_id | str substring 0..3)"
+}
+
+def do_mark_failed [spec_id: string] {
+  let s = load_state
+  let s2 = $s | update failed ($s.failed | append $spec_id | uniq)
+  save_state $s2
+}
+
+# ---------------------------------------------------------------------------
+# Lock
+# ---------------------------------------------------------------------------
+def write_lock [wave: int] {
+  ensure_dirs
+  let ts = (date now | format date "%Y-%m-%dT%H:%M:%S")
+  {pid: $nu.pid, wave: $wave, started: $ts, session: (zellij_session)} | to json --indent 2 | save --force $LOCK_FILE
+}
+
+def clear_lock [] {
+  if ($LOCK_FILE | path exists) { rm $LOCK_FILE }
+}
+
+def read_lock [] {
+  if ($LOCK_FILE | path exists) { open $LOCK_FILE } else { null }
+}
+
+def process_alive [pid: int]: nothing -> bool {
+  let raw = (^ps -p $pid -o pid= | str trim)
+  not ($raw | is-empty)
+}
+
+# ---------------------------------------------------------------------------
+# Spec helpers
+# ---------------------------------------------------------------------------
+def spec_dir [spec_id: string] {
+  let found = (ls $SPECS_DIR | where name =~ $"/($spec_id)-" | get name)
+  if ($found | length) == 0 {
+    error make {msg: $"No spec directory found for ($spec_id) in ($SPECS_DIR)"}
+  }
+  $found | first
+}
+
+def spec_md [spec_id: string] {
+  $"(spec_dir $spec_id)/spec.md"
+}
+
+def plan_md [spec_id: string] {
+  $"(spec_dir $spec_id)/plan.md"
+}
+
+# ---------------------------------------------------------------------------
+# Zellij
+# ---------------------------------------------------------------------------
+def zellij_session [] {
+  if "DISPATCH_SESSION" in $env { $env.DISPATCH_SESSION
+  } else if "ZELLIJ_SESSION_NAME" in $env { $env.ZELLIJ_SESSION_NAME
+  } else { "pmr" }
+}
+
+def spawn_pane [spec_id: string, cmd: string] {
+  let name = $"triz-($spec_id)"
+  let session = zellij_session
+  print $"  (ansi cyan)↗ ($name) → session ($session)(ansi reset)"
+  ^zellij --session $session run --name $name --close-on-exit -- nu -c $cmd
+}
+
+# ---------------------------------------------------------------------------
+# Agent shell commands
+# ---------------------------------------------------------------------------
+def codex_cmd [spec_id: string] {
+  let specfile = spec_md $spec_id
+  let planfile = plan_md $spec_id
+  let plan_ctx = if ($planfile | path exists) {
+    $"\n\n---\nIMPLEMENTATION PLAN:\n(open --raw '($planfile)')"
+  } else { "" }
+  $"let prompt = \((open --raw '($specfile)') + '($plan_ctx)'\); cd '($PROJECT_DIR)'; ^codex exec --full-auto -m ($CODEX_MODEL) -c model_reasoning_effort=xhigh $prompt; if $env.LAST_EXIT_CODE == 0 { ^nu '($PROJECT_DIR)/dispatch.codex.nu' mark-done ($spec_id) } else { ^nu '($PROJECT_DIR)/dispatch.codex.nu' mark-failed ($spec_id) }"
+}
+
+def ac_cmd [spec_id: string] {
+  $"with-env { PYTHONPATH: '($AC_PYPATH)' } { ^env -u CLAUDECODE ($AC_PYTHON) ($AC_RUNNER) --spec ($spec_id) --project-dir ($PROJECT_DIR) --force --direct }; if $env.LAST_EXIT_CODE == 0 { ^nu '($PROJECT_DIR)/dispatch.codex.nu' mark-done ($spec_id) } else { ^nu '($PROJECT_DIR)/dispatch.codex.nu' mark-failed ($spec_id) }"
+}
+
+# ---------------------------------------------------------------------------
+# Ollama pre-planning
+# ---------------------------------------------------------------------------
+def plan_spec [spec_id: string] {
+  let plan_file = plan_md $spec_id
+  if ($plan_file | path exists) {
+    print $"  [plan] ($spec_id) cached"
+    return
+  }
+
+  let spec_file = spec_md $spec_id
+  if not ($spec_file | path exists) {
+    print $"  [plan] ($spec_id) no spec.md — skip"
+    return
+  }
+
+  let spec_text = (open --raw $spec_file)
+  let body = {
+    model: $PLAN_MODEL,
+    messages: [{
+      role: "user",
+      content: $"Senior Rust/systems engineer. For this spec write: (1) RISK REGISTER top 5 risks with mitigations, (2) FILE ORDER list of files to create in order, (3) CRATE AUDIT any crates that need API verification before writing, (4) GOTCHAS known pitfalls. Be specific — name actual files, functions, crate APIs.\n\n($spec_text)"
+    }],
+    stream: false
+  }
+
+  print $"  [plan] ($spec_id) querying ($PLAN_MODEL)..."
+  let result = try {
+    http post $OLLAMA_URL ($body | to json) --content-type "application/json"
+  } catch {
+    print $"  [plan] ($PLAN_MODEL) failed — trying ($PLAN_MODEL_FALLBACK)"
+    let body2 = ($body | update model $PLAN_MODEL_FALLBACK)
+    try { http post $OLLAMA_URL ($body2 | to json) --content-type "application/json" } catch { null }
+  }
+
+  if $result != null {
+    $"# Plan — ($spec_id)\n\nModel: ($PLAN_MODEL)\n\n($result.message.content)" | save $plan_file
+    print $"  [plan] ($spec_id) saved"
+  } else {
+    print $"  [plan] ($spec_id) failed — proceeding without plan"
+  }
+}
+
+# ---------------------------------------------------------------------------
+# Wait for spec completion (polls state file)
+# ---------------------------------------------------------------------------
+def wait_done [spec_id: string, timeout_min: int = 180] {
+  let deadline = (date now) + ($timeout_min * 60sec)
+  loop {
+    let s = load_state
+    if $spec_id in $s.completed { return "done" }
+    if $spec_id in $s.failed    { return "failed" }
+    if (date now) > $deadline   { return "timeout" }
+    sleep 15sec
+  }
+}
+
+# ---------------------------------------------------------------------------
+# run_spec
+# ---------------------------------------------------------------------------
+def run_spec [s: record, dry_run: bool] {
+  if $dry_run {
+    print $"  (ansi yellow)would spawn: triz-($s.id) via ($s.agent)(ansi reset)"
+    return {ok: true}
+  }
+
+  let specfile = spec_md $s.id
+  if not ($specfile | path exists) {
+    print $"  (ansi red)missing spec.md for ($s.id)(ansi reset)"
+    return {ok: false}
+  }
+
+  plan_spec $s.id
+
+  let cmd = if $s.agent == "codex" { codex_cmd $s.id } else { ac_cmd $s.id }
+  spawn_pane $s.id $cmd
+
+  print $"  (ansi light_gray)pane triz-($s.id) running...(ansi reset)"
+  let outcome = wait_done $s.id
+  match $outcome {
+    "done"    => {ok: true}
+    "failed"  => {ok: false}
+    "timeout" => {ok: false}
+  }
+}
+
+# ---------------------------------------------------------------------------
+# plan subcommand
+# ---------------------------------------------------------------------------
+def "main plan" [--wave: int = -1] {
+  let all = specs
+  let filtered = if $wave >= 0 { $all | where wave == $wave } else { $all }
+  let state = load_state
+
+  print $"\n(ansi green_bold)── TRIZ Dispatch Plan ─────────────────────────────────(ansi reset)"
+  print $"  State: ($STATE_FILE)\n"
+
+  let token_weights = {1: 10, 2: 30, 3: 80, 4: 200}
+
+  for $w in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] {
+    let wave_specs = $filtered | where wave == $w
+    if ($wave_specs | length) == 0 { continue }
+
+    print $"(ansi blue_bold)Wave ($w)(ansi reset)"
+    for $s in $wave_specs {
+      let marker = if ($s.id in $state.completed) { $"(ansi green)✓(ansi reset)" } else if ($s.id in $state.failed) { $"(ansi red)✗(ansi reset)" } else { "·" }
+      let agent_label = if $s.agent == "codex" { $"(ansi cyan)codex(ansi reset)" } else { $"(ansi magenta)ac   (ansi reset)" }
+      let cost_label = match $s.cost { 1 => "⚀", 2 => "⚁", 3 => "⚂", 4 => "⚃", _ => "?" }
+      let plan_exists = ($"(spec_dir $s.id)/plan.md" | path exists)
+      let plan_marker = if $plan_exists { $"(ansi green)P(ansi reset)" } else { $"(ansi light_gray)·(ansi reset)" }
+      print $"  ($marker) ($s.id) ($agent_label) ($cost_label) [plan:($plan_marker)] ($s.name)"
+    }
+    print ""
+  }
+
+  let done = ($state.completed | length) - 2  # subtract 001+002 seed
+  print $"(ansi green_bold)($done)/(($all | length)) specs complete (excl. 001+002)(ansi reset)\n"
+}
+
+# ---------------------------------------------------------------------------
+# status subcommand
+# ---------------------------------------------------------------------------
+def "main status" [] {
+  let state = load_state
+  let all = specs
+  print $"\n(ansi green_bold)── TRIZ Status ─────────────────────────────────────────(ansi reset)"
+  print $"  Completed : (ansi green)($state.completed | length)(ansi reset)"
+  print $"  Failed    : (ansi red)($state.failed | length)(ansi reset)"
+  print $"  Pending   : (($all | length) - (($state.completed | length) - 2))"
+
+  if ($state.failed | length) > 0 {
+    print $"\n(ansi red)Failed:(ansi reset)"
+    for $id in $state.failed {
+      let s = $all | where id == $id
+      if ($s | length) > 0 { print $"  ✗ ($id) ($s | first | get name)" }
+    }
+  }
+  print ""
+}
+
+# ---------------------------------------------------------------------------
+# pre-plan subcommand — queue all specs through Ollama now
+# ---------------------------------------------------------------------------
+def "main pre-plan" [] {
+  let all = specs
+  print $"[pre-plan] ($all | length) specs via ($PLAN_MODEL)"
+  for $s in $all {
+    plan_spec $s.id
+  }
+  print "[pre-plan] done"
+}
+
+# ---------------------------------------------------------------------------
+# run subcommand
+# ---------------------------------------------------------------------------
+def "main run" [
+  --wave: int = -1
+  --dry-run
+  --yes
+  --session: string = ""
+  --batch-size: int = 4
+] {
+  if $session != "" { $env.DISPATCH_SESSION = $session }
+  let all = specs
+  let state = load_state
+  let target_waves = if $wave >= 0 { [$wave] } else { [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] }
+
+  if not $dry_run { main plan --wave $wave }
+  if not $dry_run and not $yes {
+    let confirm = (input $"(ansi yellow)Proceed? [y/N] (ansi reset)")
+    if $confirm !~ "^[yY]" { print "Aborted."; return }
+  }
+
+  for $w in $target_waves {
+    let current_state = load_state
+    let wave_specs = $all
+      | where wave == $w
+      | where { |s| not ($s.id in $current_state.completed) and not ($s.id in $current_state.failed) }
+
+    if ($wave_specs | length) == 0 {
+      print $"(ansi light_gray)Wave ($w): nothing pending.(ansi reset)"
+      continue
+    }
+
+    if not $dry_run { write_lock $w }
+    print $"\n(ansi blue_bold)━━ Wave ($w) ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━(ansi reset)"
+
+    mut batch = 0
+    for $s in $wave_specs {
+      print $"\n(ansi attr_bold)[($s.id)] ($s.name) via ($s.agent)(ansi reset)"
+      let res = run_spec $s $dry_run
+
+      if $res.ok {
+        do_mark_done $s.id
+        print $"(ansi green)✓ ($s.id) done(ansi reset)"
+      } else {
+        do_mark_failed $s.id
+        print $"(ansi red)✗ ($s.id) failed — logged, continuing(ansi reset)"
+      }
+
+      let $batch = $batch + 1
+      let wait = cooldown $s.cost
+      if not $dry_run {
+        print $"  (ansi light_gray)cooldown ($wait)s...(ansi reset)"
+        sleep ($wait * 1sec)
+      }
+
+      if not $dry_run and ($batch mod $batch_size) == 0 {
+        print $"\n(ansi yellow)batch pause 2 min...(ansi reset)"
+        sleep 2min
+      }
+    }
+
+    if not $dry_run { clear_lock }
+    print $"\n(ansi green)Wave ($w) complete.(ansi reset)"
+
+    if $w >= 1 and not $dry_run {
+      let isolated = $all | where wave == $w | where mode == "isolated" | where { |s| $s.id in (load_state).completed }
+      if ($isolated | length) > 0 and not $yes {
+        let cont = (input $"\n(ansi yellow)Review and merge ($isolated | length) isolated spec(s) for Wave ($w). Continue to Wave ($w + 1)? [y/N] (ansi reset)")
+        if $cont !~ "^[yY]" { print $"Paused. Resume: nu dispatch.codex.nu run --wave ($w + 1) --yes"; return }
+      }
+    }
+  }
+
+  print $"\n(ansi green_bold)Dispatch complete.(ansi reset)"
+  main status
+}
+
+# ---------------------------------------------------------------------------
+# watch-handoff — wait for wave N to finish then auto-start wave N+1
+# ---------------------------------------------------------------------------
+def "main watch-handoff" [--from-wave: int, --to-wave: int, --poll-sec: int = 15, --session: string = ""] {
+  if $session != "" { $env.DISPATCH_SESSION = $session }
+  print $"(ansi blue)watching wave ($from_wave) → ($to_wave)...(ansi reset)"
+  loop {
+    let pending = specs | where wave == $from_wave | where { |s|
+      let st = load_state
+      not ($s.id in $st.completed) and not ($s.id in $st.failed)
+    }
+    if ($pending | length) == 0 { break }
+    sleep ($poll_sec * 1sec)
+  }
+  print $"(ansi green)Wave ($from_wave) done. Starting wave ($to_wave).(ansi reset)"
+  main run --wave $to_wave --yes --session $session
+}
+
+# ---------------------------------------------------------------------------
+# mark-done / mark-failed — called by pane shell on exit
+# ---------------------------------------------------------------------------
+def "main mark-done" [spec_id: string] {
+  do_mark_done $spec_id
+  print $"(ansi green)✓ ($spec_id) marked done(ansi reset)"
+}
+
+def "main mark-failed" [spec_id: string] {
+  do_mark_failed $spec_id
+  print $"(ansi red)✗ ($spec_id) marked failed(ansi reset)"
+}
+
+# ---------------------------------------------------------------------------
+# reset / retry / review
+# ---------------------------------------------------------------------------
+def "main reset" [--spec: string = ""] {
+  if ($spec | is-empty) {
+    save_state {completed: ["001", "002"], failed: [], skipped: []}
+    print "(ansi yellow)All specs reset to pending.(ansi reset)"
+  } else {
+    let s = load_state
+    save_state ($s
+      | update completed ($s.completed | where { |id| $id != $spec })
+      | update failed    ($s.failed    | where { |id| $id != $spec }))
+    print $"(ansi yellow)($spec) reset.(ansi reset)"
+  }
+}
+
+def "main retry" [] {
+  let s = load_state
+  let n = ($s.failed | length)
+  if $n == 0 { print "(ansi green)No failed specs.(ansi reset)"; return }
+  save_state ($s | update failed [])
+  print $"(ansi yellow)($n) failed spec(s) reset.(ansi reset)"
+}
+
+def "main review" [spec_id: string] {
+  print (open --raw (spec_md $spec_id))
+}
+
+def "main list" [] {
+  specs | select id name wave cost agent mode
+}
+
+def "main lock" [] {
+  let l = read_lock
+  if $l == null { print "(ansi green)No active run.(ansi reset)"; return }
+  print ($l | to json --indent 2)
+}
+
+# ---------------------------------------------------------------------------
+# Entry point
+# ---------------------------------------------------------------------------
+def main [] {
+  print $"(ansi green_bold)TRIZ dispatch.codex.nu(ansi reset)"
+  print "Commands: plan | run | status | pre-plan | watch-handoff | mark-done | mark-failed | reset | retry | review | list | lock"
+  print ""
+  print "  nu dispatch.codex.nu pre-plan          # queue all specs through Ollama now"
+  print "  nu dispatch.codex.nu plan              # view wave plan"
+  print "  nu dispatch.codex.nu run --wave 1      # run wave 1 (011 via Codex)"
+  print "  nu dispatch.codex.nu status            # check progress"
+  print "  nu dispatch.codex.nu watch-handoff --from-wave 1 --to-wave 2"
+}
