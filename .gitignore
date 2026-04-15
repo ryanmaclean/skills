@@ -2,8 +2,10 @@
 __pycache__/
 *.py[codz]
 *$py.class
-
-# C extensions
+/autoresearch-skills/results
+/autoresearch-skills/latest_run.json
+/autoresearch-skills/eval_results.json
+/autoresearch-skills/evals/*# C extensions
 *.so
 
 # Distribution / packaging
