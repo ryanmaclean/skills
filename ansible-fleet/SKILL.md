@@ -1,9 +1,9 @@
 ---
 name: ansible-fleet
-description: Deploy and manage software on Linux fleet hosts (Pis, NAS, workstations) via Ansible. Use when user mentions deploy, ansible, fleet, hosts, inventory, or deployment.
+description: Deploy and manage software on Linux/BSD fleet hosts (Pis, NAS, workstations) via Ansible. Use when user mentions deploy, ansible, fleet, hosts, inventory, or deployment.
 compatibility: opencode
 metadata:
-  tools_needed: "Bash, SSH, Glob, Grep, Read, Write, WebFetch"
+  tools_needed: "sh, ash, SSH, Glob, Grep, Read, Write, WebFetch"
   triggers: "ansible, fleet, deploy, inventory, playbook"
 ---
 
@@ -117,7 +117,7 @@ ansible <hosts> -i inventory -b -m systemd -a "name=<service> state=started enab
 ```
 
 ## Inventory Groups
-- `[pis]` - Raspberry Pis (ARM64)
+- `[pis]` - BSD Raspberry Pis (ARM64)
 - `[nas]` - NAS devices
 - `[all:vars]` - Global variables
 

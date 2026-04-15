@@ -1,23 +1,23 @@
 {
-  "skill": "agent-skills-dd-llmo-experiment-analyzer-comparative",
+  "skill": "delegate",
   "variant": "current",
-  "timestamp": "2026-04-15T00:19:28.220130",
-  "total_tests": 1,
-  "passed": 1,
+  "timestamp": "2026-04-15T00:51:50.863511",
+  "total_tests": 4,
+  "passed": 4,
   "failed": 0,
   "pass_rate": 100.0,
   "previous_pass_rate": 0.0,
   "improvement": 100.0,
   "test_results": [
     {
-      "test_id": "tc_066",
-      "input": "Compare multiple LLM experiments side by side",
+      "test_id": "tc_055e",
+      "input": "Agent spawned via delegate task failed silently. How do I detect and handle agent failures?",
       "passed": true,
       "assertions": [
         {
           "name": "Required sections",
           "passed": true,
-          "reason": "No specific sections required for agent-skills-dd-llmo-experiment-analyzer-comparative"
+          "reason": "No specific sections required for delegate"
         },
         {
           "name": "Markdown format",
@@ -32,7 +32,7 @@
         {
           "name": "Length constraints",
           "passed": true,
-          "reason": "Appropriate length: 367 chars"
+          "reason": "Appropriate length: 369 chars"
         },
         {
           "name": "Addresses intent",
@@ -42,10 +42,124 @@
         {
           "name": "Has examples",
           "passed": true,
-          "reason": "Examples not required for agent-skills-dd-llmo-experiment-analyzer-comparative"
+          "reason": "Examples not required for delegate"
         }
       ],
-      "response": "# Agent-Skills-Dd-Llmo-Experiment-Analyzer-Comparative Response\n\n## Overview\nThis is a response for: Compare multiple LLM experiments side by side\n\n## Key Points\n- Point 1 related to the skill\n- Point 2 related to the skill  \n- Point 3 related to the skill\n\n## Examples\nExample code or configuration would go here.\n\n## Notes\nAdditional information and considerations.\n"
+      "response": "# Delegate Response\n\n## Overview\nThis is a response for: Agent spawned via delegate task failed silently. How do I detect and handle agent failures?\n\n## Key Points\n- Point 1 related to the skill\n- Point 2 related to the skill  \n- Point 3 related to the skill\n\n## Examples\nExample code or configuration would go here.\n\n## Notes\nAdditional information and considerations.\n"
+    },
+    {
+      "test_id": "tc_055f",
+      "input": "Multiple delegate tasks are running simultaneously and conflicting. How do I coordinate or serialize delegated work?",
+      "passed": true,
+      "assertions": [
+        {
+          "name": "Required sections",
+          "passed": true,
+          "reason": "No specific sections required for delegate"
+        },
+        {
+          "name": "Markdown format",
+          "passed": true,
+          "reason": "Proper markdown formatting"
+        },
+        {
+          "name": "No PII exposure",
+          "passed": true,
+          "reason": "No PII exposure detected"
+        },
+        {
+          "name": "Length constraints",
+          "passed": true,
+          "reason": "Appropriate length: 394 chars"
+        },
+        {
+          "name": "Addresses intent",
+          "passed": true,
+          "reason": "Response addresses user intent"
+        },
+        {
+          "name": "Has examples",
+          "passed": true,
+          "reason": "Examples not required for delegate"
+        }
+      ],
+      "response": "# Delegate Response\n\n## Overview\nThis is a response for: Multiple delegate tasks are running simultaneously and conflicting. How do I coordinate or serialize delegated work?\n\n## Key Points\n- Point 1 related to the skill\n- Point 2 related to the skill  \n- Point 3 related to the skill\n\n## Examples\nExample code or configuration would go here.\n\n## Notes\nAdditional information and considerations.\n"
+    },
+    {
+      "test_id": "tc_055g",
+      "input": "IRC dispatch message was sent but no agents responded. How do I verify fleet connectivity and agent availability?",
+      "passed": true,
+      "assertions": [
+        {
+          "name": "Required sections",
+          "passed": true,
+          "reason": "No specific sections required for delegate"
+        },
+        {
+          "name": "Markdown format",
+          "passed": true,
+          "reason": "Proper markdown formatting"
+        },
+        {
+          "name": "No PII exposure",
+          "passed": true,
+          "reason": "No PII exposure detected"
+        },
+        {
+          "name": "Length constraints",
+          "passed": true,
+          "reason": "Appropriate length: 391 chars"
+        },
+        {
+          "name": "Addresses intent",
+          "passed": true,
+          "reason": "Response addresses user intent"
+        },
+        {
+          "name": "Has examples",
+          "passed": true,
+          "reason": "Examples not required for delegate"
+        }
+      ],
+      "response": "# Delegate Response\n\n## Overview\nThis is a response for: IRC dispatch message was sent but no agents responded. How do I verify fleet connectivity and agent availability?\n\n## Key Points\n- Point 1 related to the skill\n- Point 2 related to the skill  \n- Point 3 related to the skill\n\n## Examples\nExample code or configuration would go here.\n\n## Notes\nAdditional information and considerations.\n"
+    },
+    {
+      "test_id": "tc_055h",
+      "input": "Wrong delegation method chosen for the task (e.g., used IRC for quick code search). How do I correct and reroute the work?",
+      "passed": true,
+      "assertions": [
+        {
+          "name": "Required sections",
+          "passed": true,
+          "reason": "No specific sections required for delegate"
+        },
+        {
+          "name": "Markdown format",
+          "passed": true,
+          "reason": "Proper markdown formatting"
+        },
+        {
+          "name": "No PII exposure",
+          "passed": true,
+          "reason": "No PII exposure detected"
+        },
+        {
+          "name": "Length constraints",
+          "passed": true,
+          "reason": "Appropriate length: 400 chars"
+        },
+        {
+          "name": "Addresses intent",
+          "passed": true,
+          "reason": "Response addresses user intent"
+        },
+        {
+          "name": "Has examples",
+          "passed": true,
+          "reason": "Examples not required for delegate"
+        }
+      ],
+      "response": "# Delegate Response\n\n## Overview\nThis is a response for: Wrong delegation method chosen for the task (e.g., used IRC for quick code search). How do I correct and reroute the work?\n\n## Key Points\n- Point 1 related to the skill\n- Point 2 related to the skill  \n- Point 3 related to the skill\n\n## Examples\nExample code or configuration would go here.\n\n## Notes\nAdditional information and considerations.\n"
     }
   ]
 }

@@ -520,5 +520,86 @@
     "passed": 1,
     "total": 0,
     "improvement": 100.0
+  },
+  {
+    "timestamp": "2026-04-15T00:48:04.272467",
+    "skill": "ansible-fleet",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 6,
+    "total": 0,
+    "improvement": 0.0
+  },
+  {
+    "timestamp": "2026-04-15T00:48:08.227826",
+    "skill": "ollama-deploy",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 6,
+    "total": 0,
+    "improvement": 0.0
+  },
+  {
+    "timestamp": "2026-04-15T00:48:11.641755",
+    "skill": "raspberry-pi",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 6,
+    "total": 0,
+    "improvement": 0.0
+  },
+  {
+    "timestamp": "2026-04-15T00:48:15.407464",
+    "skill": "elixir-gastown-ops",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 6,
+    "total": 0,
+    "improvement": 0.0
+  },
+  {
+    "timestamp": "2026-04-15T00:48:34.946134",
+    "skill": "irclaw-cluster-ops",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 6,
+    "total": 0,
+    "improvement": 0.0
+  },
+  {
+    "timestamp": "2026-04-15T00:51:21.261270",
+    "skill": "council",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 4,
+    "total": 0,
+    "improvement": 0.0
+  },
+  {
+    "timestamp": "2026-04-15T00:51:25.475631",
+    "skill": "tiger-team",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 4,
+    "total": 0,
+    "improvement": 0.0
+  },
+  {
+    "timestamp": "2026-04-15T00:51:28.703966",
+    "skill": "zellij-team",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 4,
+    "total": 0,
+    "improvement": 0.0
+  },
+  {
+    "timestamp": "2026-04-15T00:51:50.864305",
+    "skill": "delegate",
+    "variant": "current",
+    "pass_rate": 100.0,
+    "passed": 4,
+    "total": 0,
+    "improvement": 100.0
   }
 ]
