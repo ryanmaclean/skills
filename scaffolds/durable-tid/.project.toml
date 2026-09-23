@@ -1,0 +1,12 @@
+schema = "ryanlab.project.v1"
+name = "durable-tid"
+status = "experimental"
+role = "Minimal durable ordering/version primitive"
+
+canonical_for = ["durable-ordering-id", "commit-version-identity"]
+integrates_with = ["bop", "smolfire", "moth", "genoa", "skills"]
+do_not_implement = ["agent-orchestrator", "filesystem-namespace", "general-purpose-aio", "lineage-database", "transport-specific-ring"]
+
+registry = "ryanmaclean/skills:docs/PROJECTS.md"
+glossary = "ryanmaclean/skills:docs/GLOSSARY.md"
+benchmark_schema = "ryanmaclean/skills:schemas/bench.v1.schema.json"
