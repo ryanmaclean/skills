@@ -63,3 +63,54 @@ durable media
 ```
 
 A ring is an optimization of submission/completion, not the semantic model.
+
+
+## Immutability
+
+Committed records are append-only facts.
+
+A later transition may supersede a previous value but does not rewrite it.
+
+A minimal committed fact should be able to represent:
+
+```
+epoch
+tid
+request_id
+object_id
+operation
+parent_tid
+content_hash
+result
+```
+
+The trusted head may eventually collapse to:
+
+```
+(epoch, last_tid, root_hash)
+```
+
+with history stored externally.
+
+## Determinism
+
+The semantic transition function must be deterministic:
+
+```
+Transition(previous_state, canonical_record) -> next_state
+```
+
+Nondeterministic systems may propose records, but once a record crosses the commit boundary the lower layer may not depend on clocks, scheduler timing, model randomness, or implicit process state.
+
+Replay of immutable committed records must reconstruct the same canonical state.
+
+## Canonical record encoding
+
+Before hashing/signing/replay, define a canonical wire representation with fixed:
+- integer widths
+- endianness
+- field order
+- encoding/version
+- normalization rules
+
+Do not use compiler-native structure layout as a persistent format.
