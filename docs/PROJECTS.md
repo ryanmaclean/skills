@@ -1,5 +1,15 @@
 # Ryan Lab project registry
 
+## Mandatory reading
+
+Before architecture or cross-project work:
+
+- [Binding architectural constraints](CONSTRAINTS.md)
+- [Research already completed / do-not-repeat index](RESEARCH-INDEX.md)
+- [Cross-project glossary](GLOSSARY.md)
+
+These documents are authoritative unless new evidence or requirements are recorded explicitly.
+
 This is the temporary cross-project registry until/unless a dedicated portfolio repository is created.
 
 ## Lifecycle values
