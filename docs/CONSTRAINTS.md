@@ -206,3 +206,101 @@ A proposal that adds a layer must explain:
 - what duplicated state it removes
 
 If it only adds another representation of existing truth, reject or redesign it.
+
+
+## C21 — Committed facts are immutable
+
+Once a durable fact is committed, it is never modified in place.
+
+Corrections, supersession, or new state produce a new committed fact.
+
+Immutable by default:
+- commit records
+- durable TID/version identity
+- content hashes
+- epoch/trust-domain identifiers
+- attestation/checkpoint roots
+
+Mutable by default:
+- current-state pointers
+- paths
+- indexes
+- caches
+- dashboards
+- lineage/UI projections
+
+Bulk historical payloads may be garbage-collected by policy, but the immutable evidence that a version existed must remain representable.
+
+## C22 — Nondeterminism may propose state; only deterministic mechanisms commit state
+
+Agent/model output, scheduling, network timing, and human decisions may be nondeterministic.
+
+Below the proposal/commit boundary, transition semantics must be deterministic.
+
+Given the same prior committed state and canonical input record, the transition result must be identical regardless of:
+- wall-clock time
+- CPU/core scheduling
+- thread interleaving outside explicit inputs
+- model/provider randomness
+- retry timing
+
+## C23 — Deterministic replay is required
+
+Committed history must be sufficient to deterministically reconstruct current canonical state.
+
+Recovery should be:
+
+```
+checkpoint
++ immutable committed records
+-> current state
+```
+
+without heuristic reconciliation across multiple competing stores.
+
+## C24 — Canonical encoding is part of correctness
+
+Any record that is hashed, signed, replayed, or compared across implementations must use a canonical representation.
+
+Define explicitly:
+- field order
+- integer widths
+- endianness
+- string/Unicode normalization
+- omitted/default fields
+- hash domain separation/versioning
+
+Do not hash platform-native structs or unordered serialization.
+
+## C25 — Deterministic outcome semantics, not deterministic scheduling
+
+Concurrency and scheduling may vary.
+
+What must be deterministic is:
+
+```
+same committed ordered facts
+-> same reconstructed durable state
+```
+
+Do not require deterministic worker scheduling unless a specific debugging or replay requirement demands it.
+
+## C26 — Trusted state should be minimal
+
+Prefer a tiny trusted head such as:
+
+```
+(epoch, last_tid, root_hash)
+```
+
+over mirroring full history in trusted hardware.
+
+The durable log/history may live outside the trusted block; the trusted block anchors its immutable head.
+
+## C27 — Every new mutable store needs justification
+
+If a proposal introduces mutable state, it must explain:
+- why immutable append + derived view is insufficient
+- who owns the mutable truth
+- how crash recovery reconciles it
+- why the state cannot be reconstructed deterministically
