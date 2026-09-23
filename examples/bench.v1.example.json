@@ -1,0 +1,26 @@
+{
+  "schema": "ryanlab.bench.v1",
+  "project": "smolfire",
+  "timestamp": "2026-09-23T00:00:00Z",
+  "runtime": "freebsd-pvh",
+  "filesystem": "ffs",
+  "workload": "bop-state-crash-recovery-v1",
+  "commit": null,
+  "artifact_sha256": null,
+  "metrics": {
+    "artifact_bytes": null,
+    "rss_bytes": null,
+    "boot_ms": null,
+    "rename_us_p50": null,
+    "fsync_us_p50": null,
+    "recovery_ms": null,
+    "write_amplification": null,
+    "metadata_bytes_per_run": null,
+    "history_bytes_per_gib": null,
+    "lineage_reconstruction_ms": null
+  },
+  "tags": {
+    "purpose": "example"
+  },
+  "notes": "Populate with measured values; never invent benchmark data."
+}
