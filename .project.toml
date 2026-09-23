@@ -1,0 +1,12 @@
+schema = "ryanlab.project.v1"
+name = "skills"
+status = "active"
+role = "Shared workflow, policy, evaluation, and cross-project registry"
+
+canonical_for = ["agent-skills", "workflow-policy", "routing-policy-baselines", "project-registry"]
+integrates_with = ["bop", "smolfire", "moth", "genoa", "vibecode-webgui"]
+do_not_implement = ["canonical-run-state", "filesystem-version-store", "lineage-database"]
+
+registry = "ryanmaclean/skills:docs/PROJECTS.md"
+glossary = "ryanmaclean/skills:docs/GLOSSARY.md"
+benchmark_schema = "ryanmaclean/skills:schemas/bench.v1.schema.json"
