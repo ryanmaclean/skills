@@ -64,3 +64,32 @@ Use formal tooling before FPGA deployment.
 ## Hardware role
 
 FPGA and ASIC validation confirm the physical implementation matches the formally verified protocol; they are not substitutes for the proof.
+
+
+## Additional properties: immutability and deterministic replay
+
+Add these properties to the formal model:
+
+```
+CommittedRecordNeverMutates
+SameStateAndInputImpliesSameNextState
+ReplayOfCommittedPrefixIsDeterministic
+CheckpointPlusSuffixEqualsFullReplay
+CanonicalRecordHashIsStable
+```
+
+The model must distinguish proposal nondeterminism from commit determinism.
+
+Scheduling interleavings may differ, but if the same ordered committed facts result, the reconstructed durable state must be identical.
+
+## Trusted-head model
+
+Evaluate a reduced trusted state:
+
+```
+epoch
+last_tid
+root_hash
+```
+
+and prove that external immutable history can be replayed/verified against that head without storing the full history inside the trusted block.
