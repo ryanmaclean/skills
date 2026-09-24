@@ -1,0 +1,14 @@
+{
+  "name": "committed-persistent",
+  "schema_version": 0,
+  "epoch": 0,
+  "request_id": "212233445566778899aabbccddeeff01",
+  "object_id": 1,
+  "tid": 1,
+  "parent_tid": 0,
+  "operation": "durable_ack",
+  "status": "PERSISTENT",
+  "content_hash": "6ef95ff683fb8812a070c65f24b9d0dbc158bed5a60df7f3c432a70cf97c582f",
+  "payload_hex": "deadbeef",
+  "hex_file": "committed-persistent.hex"
+}

@@ -1,0 +1,14 @@
+{
+  "name": "genesis-submit",
+  "schema_version": 0,
+  "epoch": 0,
+  "request_id": "112233445566778899aabbccddeeff00",
+  "object_id": 1,
+  "tid": 0,
+  "parent_tid": 0,
+  "operation": "submit",
+  "status": "PROPOSED",
+  "content_hash": null,
+  "payload_hex": "",
+  "hex_file": "genesis-submit.hex"
+}
