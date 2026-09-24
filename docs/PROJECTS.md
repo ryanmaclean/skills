@@ -19,6 +19,7 @@ This is the temporary cross-project registry until/unless a dedicated portfolio 
 - `reference` — comparison/prior-art repo; do not make it a dependency without a specific reason
 - `maintenance` — maintained for compatibility, not a primary research target
 - `archived` — historical only
+- `mirror` — read-only copy of a canonical repo kept for locality or availability (e.g. LAN release-asset cache); never accepts direct writes and never holds facts the canonical repo lacks
 
 ## Active system
 
@@ -31,6 +32,7 @@ This is the temporary cross-project registry until/unless a dedicated portfolio 
 | `skills` | active | workflow/policy/evaluation layer and this registry |
 | `vibecode-webgui` | active | IDE/UI/control surface |
 | `agent-jail` | experimental | BSD jail isolation control |
+| `datadog-agent-freebsd` | active | Datadog Agent BSD port: patch series, native build recipes, gates, release definitions. Build/deploy receipts are Genoa-owned (`genoa.receipt.v1`, RFC 0006); it does not keep its own receipt store. |
 
 ## Reference/control repos
 
@@ -39,7 +41,13 @@ This is the temporary cross-project registry until/unless a dedicated portfolio 
 | `gastown` | reference | orchestration complexity/control baseline |
 | `tundra` | reference | broad orchestration/telemetry patterns |
 | `autoresearch` | reference | fixed-budget autonomous experiment method |
-| `dd-agent-FreeBSD` | reference | prior FreeBSD Datadog lessons |
+| `dd-agent-FreeBSD` | reference | prior FreeBSD Datadog lessons (FreeBSD ports-Makefile lineage, v7.2x). Not the active port; see `datadog-agent-freebsd`. |
+
+## Mirrors
+
+| Repo | Status | Mirror of | Use |
+|---|---|---|---|
+| QNAS Gitea `studio/datadog-agent-FreeBSD` | mirror (after RFC 0006 migration) | `datadog-agent-freebsd` releases | LAN release-asset cache for fleet installs. Its legacy `master`/open PRs and `builds/ledger.jsonl` are frozen history; nothing new is written there first. |
 
 ## Ownership rule
 
