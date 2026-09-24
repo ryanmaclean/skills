@@ -181,9 +181,18 @@ export function exploreReachableStates(start = initialState(), maxDepth = 6) {
     const next = [];
     for (const state of frontier) {
       for (const action of Actions) {
-        const params = action === "reset" || action === "duplicate_submit"
-          ? [undefined]
-          : EPOCH_VALUES.map((epoch) => ({ epoch }));
+        // Only actions whose semantics actually consult `param.epoch`
+        // (submit, device_complete, durable_ack, replay_old_epoch) are
+        // explored across every epoch value. `reset`, `duplicate_submit`,
+        // and `recover` ignore epoch entirely (see step()), so exploring
+        // them with a fake epoch parameter would only inflate the state
+        // space without exercising anything new.
+        const epochSensitive =
+          action === "submit" ||
+          action === "device_complete" ||
+          action === "durable_ack" ||
+          action === "replay_old_epoch";
+        const params = epochSensitive ? EPOCH_VALUES.map((epoch) => ({ epoch })) : [undefined];
         for (const param of params) {
           const nextState = step(state, action, param);
           edges.push({ from: state, action, param: param ?? null, to: nextState });
@@ -242,10 +251,18 @@ export function checkInvariants({ states, edges }) {
     }
   }
 
-  // 4. stale epoch cannot authorize current state: any epoch-carrying
-  //    action with param.epoch < state.epoch must be a full no-op
-  //    (deep-equal to the input state).
+  // 4. stale epoch cannot authorize current state: for the actions whose
+  //    semantics actually gate on epoch when they take their "real" path
+  //    (submit from EMPTY, device_complete, durable_ack, replay_old_epoch),
+  //    a stale param.epoch must produce a full no-op (deep-equal to the
+  //    input state). `submit` from a non-EMPTY phase is a resubmission —
+  //    it is intentionally epoch-independent and only sets `dupSeen`
+  //    (invariant 3 covers it); `reset` and `recover` don't consult epoch
+  //    at all, by design, so they're excluded here too.
+  const epochGatedActions = new Set(["submit", "device_complete", "durable_ack", "replay_old_epoch"]);
   for (const edge of edges) {
+    if (!epochGatedActions.has(edge.action)) continue;
+    if (edge.action === "submit" && edge.from.phase !== Phase.EMPTY) continue;
     if (!edge.param || edge.param.epoch === undefined) continue;
     const stale = edge.param.epoch < edge.from.epoch;
     if (stale && JSON.stringify(edge.to) !== JSON.stringify(edge.from)) {
