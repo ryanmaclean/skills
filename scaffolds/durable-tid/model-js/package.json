@@ -1,0 +1,13 @@
+{
+  "name": "durable-tid-model-js",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Exhaustive JS reference model of the durable-tid lower-bound persistence invariant. No runtime dependencies.",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test"
+  }
+}
