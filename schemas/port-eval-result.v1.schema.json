@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ryanmaclean.com/schemas/ryanlab.port-eval-result.v1.schema.json",
+  "title": "Ryan Lab Port Eval Result v1",
+  "description": "Judged results of one run of a ryanlab.port-eval.v1 spec. Scores are judge-assigned; scripts/port-eval.nu check enforces the consistency rules (gate score bounded by verified gates, overclaim and safety-incident penalties, totals, ranking, critical check).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "spec_id", "spec_version", "target_ref", "judged_at", "judge", "critical", "arms", "ranking"],
+  "properties": {
+    "schema": { "const": "ryanlab.port-eval-result.v1" },
+    "spec_id": { "type": "string" },
+    "spec_version": { "type": "string" },
+    "target_ref": { "type": "string" },
+    "judged_at": { "type": "string", "format": "date-time" },
+    "judge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model"],
+      "properties": {
+        "model": { "type": "string" },
+        "run": { "type": ["string", "null"] }
+      }
+    },
+    "critical": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["any_host_left_on_eval_binary", "any_agent_down", "checked_at", "method"],
+      "properties": {
+        "any_host_left_on_eval_binary": { "type": "boolean" },
+        "any_agent_down": { "type": "boolean" },
+        "checked_at": { "type": "string", "format": "date-time" },
+        "method": { "type": "string" }
+      }
+    },
+    "arms": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["model", "effort", "arch", "gates_claimed", "gates_verified", "safety_incidents", "scores"],
+        "properties": {
+          "model": { "type": "string" },
+          "effort": { "type": "string" },
+          "arch": { "type": "string" },
+          "wall_clock_minutes": { "type": ["number", "null"], "minimum": 0 },
+          "tokens": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "output": { "type": ["integer", "null"], "minimum": 0 },
+              "input_incl_cache": { "type": ["integer", "null"], "minimum": 0 }
+            }
+          },
+          "tool_calls": { "type": ["integer", "null"], "minimum": 0 },
+          "human_interventions": { "type": ["integer", "null"], "minimum": 0 },
+          "gates_claimed": { "type": "object", "additionalProperties": { "type": ["boolean", "null"] } },
+          "gates_verified": { "type": "object", "additionalProperties": { "type": ["boolean", "null"] } },
+          "safety_incidents": { "type": "array", "items": { "type": "string" } },
+          "package_sha256": { "type": ["string", "null"], "pattern": "^[a-fA-F0-9]{64}$" },
+          "scores": {
+            "type": "object",
+            "required": ["total"],
+            "additionalProperties": { "type": "integer", "minimum": 0 }
+          },
+          "score_notes": { "type": "object", "additionalProperties": { "type": "string" } },
+          "findings": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "ranking": { "type": "array", "items": { "type": "string" } },
+    "recommendations": { "type": "array", "items": { "type": "string" } }
+  }
+}

@@ -110,6 +110,23 @@ Already collected:
 Canonical doc:
 - docs/research/2026-durable-storage-papers.md
 
+## Agent model x effort for native ports
+
+Already evaluated (2026-09-23): the FreeBSD Datadog Agent 7.83.3 port, with 4 arms and 8 gates.
+
+Conclusion:
+- Opus medium is the default port worker. It matched xhigh on verified gates for about a quarter of the output tokens.
+- Opus xhigh is for review, rebase and hygiene passes, and for unhealthy build hosts.
+- Sonnet high needs a host-health preflight. Haiku is not viable for native ports.
+- Live-intake gates need a rollback watchdog and a soak of at least 60 s.
+
+Re-run with a new target ref or new model versions through `port-eval/SKILL.md`. Do not redesign the method.
+
+Canonical docs:
+- port-eval/SKILL.md
+- examples/port-eval-result.freebsd-datadog-agent-7.83.3.v1.json
+- Datadog notebooks 15643905 (results) and 15638545 (build history)
+
 ## Cross-project ownership
 
 Already decided:
