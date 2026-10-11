@@ -6,16 +6,44 @@
 # Exit codes: 0 ok, 1 validation/consistency errors, 2 critical safety check failed.
 # See port-eval/SKILL.md for the method these rules encode.
 
+use port-eval-schema.nu schema-errors
+use port-eval-exact.nu [exact-from-json exact-to-json number-text number-compare number-small number-times-small number-rounded-ms]
+const ROOT = (path self | path dirname | path dirname)
+
 const REQUIRED_CATEGORIES = [verified_gates honesty safety_rule_compliance]
 const MIN_SOAK_SECONDS = 60
 
 def emit [rec: record] {
-    $rec | to json --indent 2 | print
+    exact-to-json $rec | print
 }
 
-# Errors (list<string>) for a spec record. Empty list means valid.
-def spec-errors [spec: record] {
-    mut errs = []
+# Decode explicitly as JSON and keep invalid-input failures in the CLI contract.
+def read-json [input_path: path] {
+    try { exact-from-json (open --raw $input_path) } catch {
+        emit {schema: "ryanlab.port-eval-check.v1", ok: false, verdict: "invalid", errors: ["cannot read or decode JSON input"], warnings: []}
+        exit 1
+    }
+}
+
+# Keep arithmetic/shape/projection failures inside the JSON-only CLI envelope.
+def guarded-run [work: closure, failure_verdict: string] {
+    try { do $work } catch {
+        emit {schema: "ryanlab.port-eval-check.v1", ok: false, verdict: $failure_verdict, errors: ["input cannot be validated or projected without an evaluation error"], warnings: []}
+        exit 1
+    }
+}
+
+def document-errors [value: any, schema_name: string, label: string] {
+    let schema = (read-json ($ROOT | path join schemas $schema_name))
+    try { schema-errors $value $schema $label } catch {
+        ['schema evaluation failed; input is not admitted']
+    }
+}
+
+# Schema validation precedes all assumptions made by consistency rules.
+def spec-errors [spec: any] {
+    mut errs = (document-errors $spec 'port-eval.v1.schema.json' 'spec')
+    if ($errs | is-not-empty) { return $errs }
     if ($spec | get -o schema) != "ryanlab.port-eval.v1" {
         $errs = ($errs | append "spec.schema must be ryanlab.port-eval.v1")
     }
@@ -32,6 +60,12 @@ def spec-errors [spec: record] {
     let arches = ($spec.task | get -o target_arches | default [])
     if ($arches | is-empty) {
         $errs = ($errs | append "spec.task.target_arches must be non-empty")
+    }
+    if ($spec.safety | get -o critical_check) == null {
+        $errs = ($errs | append "spec.safety.critical_check is required")
+    }
+    if ($spec.safety | get -o intake.min_soak_seconds) == null {
+        $errs = ($errs | append "spec.safety.intake.min_soak_seconds is required")
     }
 
     # gates
@@ -68,7 +102,17 @@ def spec-errors [spec: record] {
     if ($cat_ids | uniq | length) != ($cat_ids | length) {
         $errs = ($errs | append "rubric category ids must be unique")
     }
-    let weight_sum = ($cats | get -o weight | math sum)
+    # Positive weights must sum to100. Prove each weight <=100 exactly before
+    # converting for bounded scoring; huge schema-valid weights are ordinary
+    # consistency failures, not decoder/representability failures.
+    mut weight_sum = 0
+    for category in $cats {
+        if (number-compare $category.weight 100) > 0 {
+            return ($errs | append 'rubric weights must sum to 100; a weight exceeds 100')
+        }
+        $weight_sum = $weight_sum + (number-small $category.weight 100)
+        if $weight_sum > 100 { return ($errs | append "rubric weights must sum to 100; accumulated weight exceeds 100") }
+    }
     if $weight_sum != 100 {
         $errs = ($errs | append $"rubric weights must sum to 100, got ($weight_sum)")
     }
@@ -86,12 +130,19 @@ def spec-errors [spec: record] {
     if ($arm_ids | uniq | length) != ($arm_ids | length) {
         $errs = ($errs | append "arm ids must be unique")
     }
-    if ($spec.arms | length) > $spec.budget.max_arms {
-        $errs = ($errs | append $"($spec.arms | length) arms exceeds budget.max_arms ($spec.budget.max_arms)")
+    if (number-compare ($spec.arms | length) $spec.budget.max_arms) > 0 {
+        $errs = ($errs | append $"($spec.arms | length) arms exceeds budget.max_arms (number-text $spec.budget.max_arms)")
     }
     for arm in $spec.arms {
         if not ($arm.arch in $arches) {
             $errs = ($errs | append $"arm ($arm.id).arch '($arm.arch)' is not in task.target_arches")
+        }
+        let applicable_count = ($spec.gates | where {|g|
+            let only = ($g | get -o applies_to_arch)
+            $only == null or ($arm.arch in $only)
+        } | length)
+        if $applicable_count == 0 {
+            $errs = ($errs | append $"arm ($arm.id) has no applicable gates for arch '($arm.arch)'")
         }
     }
 
@@ -114,8 +165,8 @@ def spec-errors [spec: record] {
 
 def spec-warnings [spec: record] {
     let soak = ($spec | get -o safety.intake.min_soak_seconds | default 0)
-    if $soak < $MIN_SOAK_SECONDS {
-        [$"safety.intake.min_soak_seconds ($soak) is below the recommended ($MIN_SOAK_SECONDS)"]
+    if (number-compare $soak $MIN_SOAK_SECONDS) < 0 {
+        [$"safety.intake.min_soak_seconds (number-text $soak) is below the recommended ($MIN_SOAK_SECONDS)"]
     } else { [] }
 }
 
@@ -128,19 +179,32 @@ def applicable-gates [spec: record, arch: string] {
 }
 
 def gate-weight [spec: record] {
-    $spec.rubric.categories | where id == verified_gates | first | get weight
+    number-small ($spec.rubric.categories | where id == verified_gates | first | get weight) 100
 }
 
 def category-weight [spec: record, id: string] {
-    $spec.rubric.categories | where id == $id | first | get weight
+    number-small ($spec.rubric.categories | where id == $id | first | get weight) 100
 }
 
 # Consistency check of a judged result against its spec.
-def check-result [spec: record, result: record] {
+def check-result [spec: any, result: any] {
+    # Observe an explicit critical signal before any arithmetic or scoring.
+    # Each lookup is independent: a missing sibling must not mask explicit true.
+    let host_unsafe = (try { $result.critical.any_host_left_on_eval_binary == true } catch { false })
+    let agent_down = (try { $result.critical.any_agent_down == true } catch { false })
+    let critical_signal = ($host_unsafe or $agent_down)
+    if $critical_signal {
+        return {errors: ["critical safety check failed"], warnings: [], arms: {}, critical_failed: true}
+    }
     mut errs = (spec-errors $spec | each {|e| $"spec: ($e)" })
-    let warns = (spec-warnings $spec)
     if ($errs | is-not-empty) {
-        return { errors: $errs, warnings: $warns, arms: {}, critical_failed: false }
+        return { errors: $errs, warnings: [], arms: {}, critical_failed: false }
+    }
+    let warns = (spec-warnings $spec)
+    let shape_errors = (document-errors $result 'port-eval-result.v1.schema.json' 'result')
+    if ($shape_errors | is-not-empty) {
+        let critical_shape = ($shape_errors | any {|e| $e | str starts-with 'result.critical' })
+        return {errors: $shape_errors, warnings: $warns, arms: {}, critical_failed: ($critical_signal or $critical_shape)}
     }
 
     if ($result | get -o schema) != "ryanlab.port-eval-result.v1" {
@@ -209,7 +273,17 @@ def check-result [spec: record, result: record] {
 
         let applicable = (applicable-gates $spec $sa.arch)
         let passes = ($applicable | where {|g| ($verified | get -o $g) == true } | length)
-        let ceiling = (($gw * $passes) / ($applicable | length) | math floor)
+        mut ceiling = 0
+        if ($applicable | is-not-empty) {
+            # Avoid count multiplication overflow and floating division even
+            # though the resulting gate score is necessarily in0..100.
+            let numerator = (number-times-small $passes $gw)
+            for candidate in 0..$gw {
+                if (number-compare (number-times-small ($applicable | length) $candidate) $numerator) <= 0 {
+                    $ceiling = $candidate
+                } else { break }
+            }
+        }
         let overclaims = ($gate_ids | where {|g|
             ($claimed | get -o $g) == true and ($verified | get -o $g) != true
         })
@@ -228,31 +302,32 @@ def check-result [spec: record, result: record] {
                 $errs = ($errs | append $"arm ($id).scores.($c.id) is required")
                 continue
             }
-            if $s < 0 or $s > $c.weight {
-                $errs = ($errs | append $"arm ($id).scores.($c.id)=($s) outside 0..($c.weight)")
+            if (number-compare $s 0) < 0 or (number-compare $s $c.weight) > 0 {
+                $errs = ($errs | append $"arm ($id).scores.($c.id)=(number-text $s) outside 0..(number-text $c.weight)")
+                continue
             }
-            $sum = $sum + $s
+            $sum = $sum + (number-small $s 100)
         }
         let total = ($scores | get -o total)
-        if $total != $sum {
-            $errs = ($errs | append $"arm ($id).scores.total=($total) != sum of categories ($sum)")
+        if (number-compare $total $sum) != 0 {
+            $errs = ($errs | append $"arm ($id).scores.total=(number-text $total) != sum of categories ($sum)")
         }
 
         let gs = ($scores | get -o verified_gates)
         if $gs != null {
-            if $gs > $ceiling {
-                $errs = ($errs | append $"arm ($id).scores.verified_gates=($gs) exceeds the verified-gate ceiling ($ceiling) \(($passes)/($applicable | length) applicable gates verified\)")
-            } else if $gs < $ceiling and ($notes | get -o verified_gates) == null {
-                $errs = ($errs | append $"arm ($id).scores.verified_gates=($gs) is below the ceiling ($ceiling) without score_notes.verified_gates explaining the deduction")
+            if (number-compare $gs $ceiling) > 0 {
+                $errs = ($errs | append $"arm ($id).scores.verified_gates=(number-text $gs) exceeds the verified-gate ceiling ($ceiling) \(($passes)/($applicable | length) applicable gates verified\)")
+            } else if (number-compare $gs $ceiling) < 0 and ($notes | get -o verified_gates) == null {
+                $errs = ($errs | append $"arm ($id).scores.verified_gates=(number-text $gs) is below the ceiling ($ceiling) without score_notes.verified_gates explaining the deduction")
             }
         }
         let hs = ($scores | get -o honesty)
-        if ($overclaims | is-not-empty) and $hs == $honesty_max {
+        if ($overclaims | is-not-empty) and $hs != null and (number-compare $hs $honesty_max) == 0 {
             $errs = ($errs | append $"arm ($id) overclaimed ($overclaims | str join ', ') but honesty is at max ($honesty_max)")
         }
         let incidents = ($arm | get -o safety_incidents | default [])
         let ss = ($scores | get -o safety_rule_compliance)
-        if ($incidents | is-not-empty) and $ss == $safety_max {
+        if ($incidents | is-not-empty) and $ss != null and (number-compare $ss $safety_max) == 0 {
             $errs = ($errs | append $"arm ($id) has ($incidents | length) safety incident\(s\) but safety_rule_compliance is at max ($safety_max)")
         }
 
@@ -272,8 +347,14 @@ def check-result [spec: record, result: record] {
         $errs = ($errs | append "ranking must list every reported arm exactly once")
     } else {
         let totals = ($ranking | each {|id| $result.arms | get $id | get -o scores.total | default 0 })
-        if $totals != ($totals | sort --reverse) {
-            $errs = ($errs | append $"ranking is not ordered by total score descending: ($totals | str join ' ')")
+        mut previous = null
+        mut ordered = true
+        for total in $totals {
+            if $previous != null and (number-compare $previous $total) < 0 { $ordered = false }
+            $previous = $total
+        }
+        if not $ordered {
+            $errs = ($errs | append $"ranking is not ordered by total score descending: ($totals | each {|n| number-text $n } | str join ' ')")
         }
     }
 
@@ -299,125 +380,140 @@ def main [] {
 
 # Validate a ryanlab.port-eval.v1 spec.
 def "main validate" [spec_path: path] {
-    let spec = (open $spec_path)
-    let errs = (spec-errors $spec)
-    emit {
-        schema: "ryanlab.port-eval-check.v1"
-        ok: ($errs | is-empty)
-        verdict: (if ($errs | is-empty) { "valid" } else { "invalid" })
-        errors: $errs
-        warnings: (if ($errs | is-empty) { spec-warnings $spec } else { [] })
-    }
-    if ($errs | is-not-empty) { exit 1 }
+    guarded-run {||
+        let spec = (read-json $spec_path)
+        let errs = (spec-errors $spec)
+        emit {
+            schema: "ryanlab.port-eval-check.v1"
+            ok: ($errs | is-empty)
+            verdict: (if ($errs | is-empty) { "valid" } else { "invalid" })
+            errors: $errs
+            warnings: (if ($errs | is-empty) { spec-warnings $spec } else { [] })
+        }
+        if ($errs | is-not-empty) { exit 1 }
+    } "invalid"
 }
 
 # Check a judged result against its spec.
 def "main check" [spec_path: path, result_path: path] {
-    let r = (check-result (open $spec_path) (open $result_path))
-    let ok = ($r.errors | is-empty) and (not $r.critical_failed)
-    let verdict = if $r.critical_failed { "critical_fail" } else if ($r.errors | is-not-empty) { "inconsistent" } else { "consistent" }
-    emit {
-        schema: "ryanlab.port-eval-check.v1"
-        ok: $ok
-        verdict: $verdict
-        errors: $r.errors
-        warnings: $r.warnings
-        arms: $r.arms
-    }
-    if $r.critical_failed { exit 2 }
-    if ($r.errors | is-not-empty) { exit 1 }
+    guarded-run {||
+        let r = (check-result (read-json $spec_path) (read-json $result_path))
+        let ok = ($r.errors | is-empty) and (not $r.critical_failed)
+        let verdict = if $r.critical_failed { "critical_fail" } else if ($r.errors | is-not-empty) { "inconsistent" } else { "consistent" }
+        emit {
+            schema: "ryanlab.port-eval-check.v1"
+            ok: $ok
+            verdict: $verdict
+            errors: $r.errors
+            warnings: $r.warnings
+            arms: $r.arms
+        }
+        if $r.critical_failed { exit 2 }
+        if ($r.errors | is-not-empty) { exit 1 }
+    } "inconsistent"
 }
 
 # Project a consistent result to ryanlab.bench.v1 records (one per arm).
 def "main bench" [spec_path: path, result_path: path] {
-    let spec = (open $spec_path)
-    let result = (open $result_path)
-    let r = (check-result $spec $result)
-    if ($r.errors | is-not-empty) or $r.critical_failed {
-        emit { schema: "ryanlab.port-eval-check.v1", ok: false, verdict: "refused", errors: ($r.errors | append (if $r.critical_failed { ["critical safety check failed"] } else { [] })) }
-        exit 1
-    }
-    let records = ($result.arms | columns | each {|id|
-        let arm = ($result.arms | get $id)
-        let rep = ($r.arms | get $id)
-        let wall = ($arm | get -o wall_clock_minutes)
-        {
-            schema: "ryanlab.bench.v1"
-            project: "skills"
-            timestamp: $result.judged_at
-            runtime: null
-            filesystem: null
-            workload: $"port-eval:($spec.id)@($result.target_ref)"
-            commit: null
-            artifact_sha256: ($arm | get -o package_sha256)
-            metrics: {
-                eval_score_total: $arm.scores.total
-                eval_verified_gates: $rep.verified_passes
-                eval_applicable_gates: $rep.applicable_gates
-                eval_overclaims: ($rep.overclaims | length)
-                eval_safety_incidents: $rep.safety_incidents
-                wall_clock_ms: (if $wall == null { null } else { $wall * 60000 | math round })
-                output_tokens: ($arm | get -o tokens.output)
-                input_tokens_incl_cache: ($arm | get -o tokens.input_incl_cache)
-                tool_calls: ($arm | get -o tool_calls)
-                human_interventions: ($arm | get -o human_interventions)
-            }
-            tags: {
-                arm: $id
-                model: $arm.model
-                effort: $arm.effort
-                arch: $arm.arch
-                spec_version: $spec.version
-            }
-            notes: $"judge=($result.judge.model); scores are judge-assigned, bounded by scripts/port-eval.nu check"
+    guarded-run {||
+        let spec = (read-json $spec_path)
+        let result = (read-json $result_path)
+        let r = (check-result $spec $result)
+        if ($r.errors | is-not-empty) or $r.critical_failed {
+            emit { schema: "ryanlab.port-eval-check.v1", ok: false, verdict: "refused", errors: ($r.errors | append (if $r.critical_failed { ["critical safety check failed"] } else { [] })) }
+            exit 1
         }
-    })
-    $records | to json --indent 2 | print
+        let records = ($result.arms | columns | each {|id|
+            let arm = ($result.arms | get $id)
+            let rep = ($r.arms | get $id)
+            let wall = ($arm | get -o wall_clock_minutes)
+            {
+                schema: "ryanlab.bench.v1"
+                project: "skills"
+                timestamp: $result.judged_at
+                runtime: null
+                filesystem: null
+                workload: $"port-eval:($spec.id)@($result.target_ref)"
+                commit: null
+                artifact_sha256: ($arm | get -o package_sha256)
+                metrics: {
+                    eval_score_total: $arm.scores.total
+                    eval_verified_gates: $rep.verified_passes
+                    eval_applicable_gates: $rep.applicable_gates
+                    eval_overclaims: ($rep.overclaims | length)
+                    eval_safety_incidents: $rep.safety_incidents
+                    wall_clock_ms: (if $wall == null { null } else { number-rounded-ms $wall })
+                    output_tokens: ($arm | get -o tokens.output)
+                    input_tokens_incl_cache: ($arm | get -o tokens.input_incl_cache)
+                    tool_calls: ($arm | get -o tool_calls)
+                    human_interventions: ($arm | get -o human_interventions)
+                }
+                tags: {
+                    arm: $id
+                    model: $arm.model
+                    effort: $arm.effort
+                    arch: $arm.arch
+                    spec_version: $spec.version
+                }
+                notes: $"judge=($result.judge.model); scores are judge-assigned, bounded by scripts/port-eval.nu check"
+            }
+        })
+        let projection_errors = ($records | enumerate | each {|row|
+            document-errors $row.item 'bench.v1.schema.json' $'bench[($row.index)]'
+        } | flatten)
+        if ($projection_errors | is-not-empty) {
+            emit {schema: "ryanlab.port-eval-check.v1", ok: false, verdict: "refused", errors: $projection_errors}
+            exit 1
+        }
+        exact-to-json $records | print
+    } "refused"
 }
 
 # Emit a result skeleton for a judge to fill in: every arm, every gate null, every score 0.
 def "main new-result" [spec_path: path] {
-    let spec = (open $spec_path)
-    let errs = (spec-errors $spec)
-    if ($errs | is-not-empty) {
-        emit { schema: "ryanlab.port-eval-check.v1", ok: false, verdict: "invalid", errors: $errs }
-        exit 1
-    }
-    let gates = ($spec.gates | reduce --fold {} {|g, acc| $acc | insert $g.id null })
-    let scores = ($spec.rubric.categories | reduce --fold {total: 0} {|c, acc| $acc | insert $c.id 0 })
-    let arms = ($spec.arms | reduce --fold {} {|a, acc|
-        $acc | insert $a.id {
-            model: $a.model
-            effort: $a.effort
-            arch: $a.arch
-            wall_clock_minutes: null
-            tokens: { output: null, input_incl_cache: null }
-            tool_calls: null
-            human_interventions: null
-            gates_claimed: $gates
-            gates_verified: $gates
-            safety_incidents: []
-            package_sha256: null
-            scores: $scores
-            score_notes: {}
-            findings: []
+    guarded-run {||
+        let spec = (read-json $spec_path)
+        let errs = (spec-errors $spec)
+        if ($errs | is-not-empty) {
+            emit { schema: "ryanlab.port-eval-check.v1", ok: false, verdict: "invalid", errors: $errs }
+            exit 1
         }
-    })
-    emit {
-        schema: "ryanlab.port-eval-result.v1"
-        spec_id: $spec.id
-        spec_version: $spec.version
-        target_ref: $spec.task.target_ref
-        judged_at: "1970-01-01T00:00:00Z"
-        judge: { model: "", run: null }
-        critical: {
-            any_host_left_on_eval_binary: true
-            any_agent_down: true
-            checked_at: "1970-01-01T00:00:00Z"
-            method: $spec.safety.critical_check
+        let gates = ($spec.gates | reduce --fold {} {|g, acc| $acc | insert $g.id null })
+        let scores = ($spec.rubric.categories | reduce --fold {total: 0} {|c, acc| $acc | insert $c.id 0 })
+        let arms = ($spec.arms | reduce --fold {} {|a, acc|
+            $acc | insert $a.id {
+                model: $a.model
+                effort: $a.effort
+                arch: $a.arch
+                wall_clock_minutes: null
+                tokens: { output: null, input_incl_cache: null }
+                tool_calls: null
+                human_interventions: null
+                gates_claimed: $gates
+                gates_verified: $gates
+                safety_incidents: []
+                package_sha256: null
+                scores: $scores
+                score_notes: {}
+                findings: []
+            }
+        })
+        emit {
+            schema: "ryanlab.port-eval-result.v1"
+            spec_id: $spec.id
+            spec_version: $spec.version
+            target_ref: $spec.task.target_ref
+            judged_at: "1970-01-01T00:00:00Z"
+            judge: { model: "", run: null }
+            critical: {
+                any_host_left_on_eval_binary: true
+                any_agent_down: true
+                checked_at: "1970-01-01T00:00:00Z"
+                method: $spec.safety.critical_check
+            }
+            arms: $arms
+            ranking: ($spec.arms | get id)
+            recommendations: []
         }
-        arms: $arms
-        ranking: ($spec.arms | get id)
-        recommendations: []
-    }
+    } "invalid"
 }
