@@ -347,7 +347,7 @@ def check-result [spec: any, result: any] {
         $errs = ($errs | append "ranking must list every reported arm exactly once")
     } else {
         let totals = ($ranking | each {|id| $result.arms | get $id | get -o scores.total | default 0 })
-        mut previous = null
+        mut previous: any = null
         mut ordered = true
         for total in $totals {
             if $previous != null and (number-compare $previous $total) < 0 { $ordered = false }

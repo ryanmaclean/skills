@@ -342,7 +342,7 @@ def test_schema_array_and_numeric_constraints [] {
     expect-error (tool validate $empty) "too few items"
     let number = (write-json $d number.json (open $SPEC | upsert budget.max_arms 1.5))
     expect-error (tool validate $number) "integer"
-    let negative = (write-json $d negative.json (open $RESULT | upsert arms.opus-xhigh-amd64.tool_calls -1))
+    let negative = (write-json $d negative.json (open $RESULT | upsert arms.opus-xhigh-amd64.tool_calls (-1)))
     expect-error (tool check $SPEC $negative) "below minimum"
     rm -rf $d
 }
