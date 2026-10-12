@@ -155,11 +155,15 @@ the `.json` projection exactly.
    request commits at most once"), used by the JS model's duplicate-submit
    test to assert the second submission does not advance state.
 
-Fixture generation (`../fixtures/generate.sh`) is a plain POSIX `/bin/sh` +
-`openssl`/`shasum` script with no build step, so the fixtures can be
-regenerated and diffed without a language toolchain; it is not itself part
-of the canonical format, only a convenience for keeping the checked-in
-fixtures reproducible.
+Fixture generation (`../fixtures/generate.nu`) uses Nushell builtins only.
+From the fixture directory, run `nu --no-config-file generate.nu` to
+regenerate the same six files. Run `nu --no-config-file generate.test.nu
+/path/to/new/private/scratch` for byte-for-byte parity against the checked-in
+fixtures, repeat-generation and integer-boundary checks. The scratch path must
+not already exist; test artifacts are retained there. No shell, OpenSSL or GNU
+helper is invoked by this Nu entry. The legacy `generate.sh` and its hosted
+workflow are unchanged pending an explicitly provisioned Nu CI route. The
+generator is a fixture convenience, not part of the canonical wire format.
 
 ## Non-goals for v0
 
