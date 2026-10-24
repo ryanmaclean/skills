@@ -1,0 +1,194 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Release Binaries
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - goos: linux
+            goarch: amd64
+          - goos: linux
+            goarch: arm64
+          - goos: darwin
+            goarch: amd64
+          - goos: darwin
+            goarch: arm64
+          - goos: windows
+            goarch: amd64
+          - goos: windows
+            goarch: arm64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache: true
+
+      - name: Get version from tag
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          COMMIT=$(git rev-parse --short HEAD)
+          BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "commit=${COMMIT}" >> $GITHUB_OUTPUT
+          echo "build_date=${BUILD_DATE}" >> $GITHUB_OUTPUT
+
+      - name: Build binary
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: 0
+        run: |
+          BINARY_NAME="dd"
+          if [ "${{ matrix.goos }}" = "windows" ]; then
+            BINARY_NAME="dd.exe"
+          fi
+
+          mkdir -p dist
+          go build \
+            -ldflags="-s -w -X main.version=${{ steps.version.outputs.version }} -X main.commit=${{ steps.version.outputs.commit }} -X main.buildDate=${{ steps.version.outputs.build_date }}" \
+            -o "dist/${BINARY_NAME}" \
+            ./cmd
+
+      - name: Create archive
+        run: |
+          cd dist
+          ARCHIVE_NAME="dd-${{ steps.version.outputs.version }}-${{ matrix.goos }}-${{ matrix.goarch }}"
+          if [ "${{ matrix.goos }}" = "windows" ]; then
+            zip "${ARCHIVE_NAME}.zip" dd.exe
+            echo "ARCHIVE=${ARCHIVE_NAME}.zip" >> $GITHUB_ENV
+          else
+            tar czf "${ARCHIVE_NAME}.tar.gz" dd
+            echo "ARCHIVE=${ARCHIVE_NAME}.tar.gz" >> $GITHUB_ENV
+          fi
+
+      - name: Generate checksum
+        run: |
+          cd dist
+          sha256sum "${ARCHIVE}" > "${ARCHIVE}.sha256"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dd-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: |
+            dist/${{ env.ARCHIVE }}
+            dist/${{ env.ARCHIVE }}.sha256
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Get version from tag
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          if [ -z "$PREVIOUS_TAG" ]; then
+            CHANGELOG="Initial release"
+          else
+            CHANGELOG=$(git log ${PREVIOUS_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          fi
+
+          # Save to file to avoid issues with special characters
+          echo "$CHANGELOG" > changelog.txt
+          echo "changelog_file=changelog.txt" >> $GITHUB_OUTPUT
+
+      - name: Create release notes
+        run: |
+          cat > release-notes.md << 'EOF'
+          # Datadog CLI ${{ steps.version.outputs.version }}
+
+          ## Installation
+
+          ### Linux (amd64)
+          ```bash
+          curl -L -o dd.tar.gz https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.version }}/dd-${{ steps.version.outputs.version }}-linux-amd64.tar.gz
+          tar xzf dd.tar.gz
+          sudo mv dd /usr/local/bin/
+          dd version
+          ```
+
+          ### macOS (Apple Silicon)
+          ```bash
+          curl -L -o dd.tar.gz https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.version }}/dd-${{ steps.version.outputs.version }}-darwin-arm64.tar.gz
+          tar xzf dd.tar.gz
+          sudo mv dd /usr/local/bin/
+          dd version
+          ```
+
+          ### macOS (Intel)
+          ```bash
+          curl -L -o dd.tar.gz https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.version }}/dd-${{ steps.version.outputs.version }}-darwin-amd64.tar.gz
+          tar xzf dd.tar.gz
+          sudo mv dd /usr/local/bin/
+          dd version
+          ```
+
+          ### Windows (PowerShell)
+          ```powershell
+          Invoke-WebRequest -Uri "https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.version }}/dd-${{ steps.version.outputs.version }}-windows-amd64.zip" -OutFile dd.zip
+          Expand-Archive dd.zip
+          Move-Item dd\dd.exe C:\Windows\System32\
+          dd version
+          ```
+
+          ## Changelog
+
+          EOF
+          cat ${{ steps.changelog.outputs.changelog_file }} >> release-notes.md
+          echo "" >> release-notes.md
+          echo "## Checksums" >> release-notes.md
+          echo "" >> release-notes.md
+          echo '```' >> release-notes.md
+          cat artifacts/*.sha256 >> release-notes.md
+          echo '```' >> release-notes.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ steps.version.outputs.version }}
+          body_path: release-notes.md
+          files: |
+            artifacts/*
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.version, '-') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

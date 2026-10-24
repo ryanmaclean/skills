@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or Discussion
+    url: https://github.com/datadog/skill/discussions
+    about: Ask questions or discuss ideas with the community
+  - name: Security Vulnerability
+    url: https://github.com/datadog/skill/security/advisories/new
+    about: Report a security vulnerability (private disclosure)
+  - name: Datadog Support
+    url: https://docs.datadoghq.com/help/
+    about: Get help with Datadog products and services

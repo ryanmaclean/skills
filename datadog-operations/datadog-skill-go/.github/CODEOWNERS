@@ -1,0 +1,33 @@
+# Code Owners for Datadog CLI
+
+# Default owners for everything
+* @datadog/skill-maintainers
+
+# GitHub Actions workflows
+/.github/workflows/ @datadog/skill-maintainers @datadog/devops
+
+# Docker and container configuration
+/Dockerfile @datadog/skill-maintainers @datadog/devops
+/.dockerignore @datadog/skill-maintainers @datadog/devops
+
+# Go modules and dependencies
+/go.mod @datadog/skill-maintainers
+/go.sum @datadog/skill-maintainers
+
+# Core commands
+/internal/commands/ @datadog/skill-maintainers
+
+# Datadog client
+/internal/client/ @datadog/skill-maintainers @datadog/api-team
+
+# Observability instrumentation
+/internal/observability/ @datadog/skill-maintainers @datadog/observability-team
+
+# Documentation
+*.md @datadog/skill-maintainers @datadog/docs-team
+/CONTRIBUTING.md @datadog/skill-maintainers
+
+# CI/CD configuration
+/.github/ @datadog/skill-maintainers @datadog/devops
+/Makefile @datadog/skill-maintainers @datadog/devops
+/.golangci.yml @datadog/skill-maintainers

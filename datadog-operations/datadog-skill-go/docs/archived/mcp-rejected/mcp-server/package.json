@@ -1,0 +1,38 @@
+{
+  "name": "@datadog-skill/mcp-server",
+  "version": "0.1.0",
+  "description": "Model Context Protocol server for Datadog CLI - enables AI agents to access Datadog observability",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "datadog-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "dev": "tsc && node dist/index.js",
+    "start": "node dist/index.js",
+    "inspector": "node --inspect dist/index.js"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "datadog",
+    "observability",
+    "ai",
+    "cursor",
+    "claude"
+  ],
+  "author": "Ryan MacLean",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

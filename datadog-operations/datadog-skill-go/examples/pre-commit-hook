@@ -1,0 +1,135 @@
+#!/bin/bash
+# Pre-Commit Hook for Datadog Health Checks
+#
+# Installation:
+#   1. Copy this file to .git/hooks/pre-commit
+#   2. Make it executable: chmod +x .git/hooks/pre-commit
+#   3. Configure service name below or use auto-detection
+#
+# This hook prevents commits if the service is unhealthy.
+
+# Configuration
+SERVICE_NAME=""  # Leave empty for auto-detection
+CHECK_HEALTH=true
+CHECK_ERROR_RATE=true
+ERROR_RATE_THRESHOLD=5.0
+SKIP_ON_ERROR=false  # Set to true to skip checks if CLI fails
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+# Check if dd command is available
+if ! command -v dd &> /dev/null; then
+    echo -e "${YELLOW}⚠️  Datadog CLI not found - skipping health checks${NC}"
+    exit 0
+fi
+
+# Check if credentials are configured
+if [ -z "$DD_API_KEY" ] || [ -z "$DD_APP_KEY" ]; then
+    if [ "$SKIP_ON_ERROR" = true ]; then
+        echo -e "${YELLOW}⚠️  Datadog credentials not configured - skipping health checks${NC}"
+        exit 0
+    else
+        echo -e "${RED}❌ Datadog credentials not configured${NC}"
+        echo "Set DD_API_KEY and DD_APP_KEY environment variables"
+        exit 1
+    fi
+fi
+
+echo ""
+echo "🐶 Running Datadog pre-commit checks..."
+echo ""
+
+# Health check
+if [ "$CHECK_HEALTH" = true ]; then
+    echo -n "Checking service health... "
+
+    if [ -n "$SERVICE_NAME" ]; then
+        HEALTH_JSON=$(dd health "$SERVICE_NAME" --json 2>/dev/null)
+    else
+        HEALTH_JSON=$(dd health --json 2>/dev/null)
+    fi
+
+    if [ -z "$HEALTH_JSON" ]; then
+        if [ "$SKIP_ON_ERROR" = true ]; then
+            echo -e "${YELLOW}SKIPPED${NC}"
+        else
+            echo -e "${RED}FAILED${NC}"
+            echo ""
+            echo -e "${RED}❌ Could not fetch service health${NC}"
+            echo "Run 'dd health' manually to debug"
+            exit 1
+        fi
+    else
+        STATUS=$(echo "$HEALTH_JSON" | jq -r '.status')
+
+        if [ "$STATUS" = "healthy" ]; then
+            echo -e "${GREEN}PASS${NC} (healthy)"
+        elif [ "$STATUS" = "degraded" ]; then
+            echo -e "${YELLOW}WARNING${NC} (degraded)"
+            echo ""
+            echo -e "${YELLOW}⚠️  Service is degraded but commit allowed${NC}"
+            echo "Consider investigating before pushing."
+        else
+            echo -e "${RED}FAIL${NC} (unhealthy)"
+            echo ""
+            echo -e "${RED}❌ Service is unhealthy - commit blocked${NC}"
+            echo ""
+            echo "Service must be healthy before committing."
+            echo "Check status: dd health"
+            echo ""
+            echo "To bypass this check (not recommended):"
+            echo "  git commit --no-verify"
+            exit 1
+        fi
+    fi
+fi
+
+# Error rate check
+if [ "$CHECK_ERROR_RATE" = true ]; then
+    echo -n "Checking error rate... "
+
+    if [ -n "$SERVICE_NAME" ]; then
+        ERROR_RATE=$(dd apm "$SERVICE_NAME" --status error --from 15m --json 2>/dev/null | jq -r '.error_rate // "0"')
+    else
+        ERROR_RATE=$(dd apm --status error --from 15m --json 2>/dev/null | jq -r '.error_rate // "0"')
+    fi
+
+    if [ -z "$ERROR_RATE" ] || [ "$ERROR_RATE" = "null" ]; then
+        if [ "$SKIP_ON_ERROR" = true ]; then
+            echo -e "${YELLOW}SKIPPED${NC}"
+        else
+            echo -e "${YELLOW}WARNING${NC}"
+        fi
+    else
+        ERROR_RATE_FLOAT=$(echo "$ERROR_RATE" | awk '{print $1}')
+
+        if (( $(echo "$ERROR_RATE_FLOAT > $ERROR_RATE_THRESHOLD" | bc -l) )); then
+            echo -e "${RED}FAIL${NC} (${ERROR_RATE}%)"
+            echo ""
+            echo -e "${RED}❌ Error rate is too high: ${ERROR_RATE}% (threshold: ${ERROR_RATE_THRESHOLD}%)${NC}"
+            echo ""
+            echo "Recent errors:"
+            if [ -n "$SERVICE_NAME" ]; then
+                dd logs --service "$SERVICE_NAME" --status error --from 5m --limit 3 2>/dev/null | jq -r '.[].message' | head -3 | sed 's/^/  - /'
+            else
+                dd logs --status error --from 5m --limit 3 2>/dev/null | jq -r '.[].message' | head -3 | sed 's/^/  - /'
+            fi
+            echo ""
+            echo "Investigate errors before committing."
+            echo "To bypass: git commit --no-verify"
+            exit 1
+        else
+            echo -e "${GREEN}PASS${NC} (${ERROR_RATE}%)"
+        fi
+    fi
+fi
+
+echo ""
+echo -e "${GREEN}✅ All pre-commit checks passed${NC}"
+echo ""
+
+exit 0

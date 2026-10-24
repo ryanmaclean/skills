@@ -1,0 +1,9 @@
+go_package(
+    name="commands",
+    sources=["*.go"],
+    dependencies=[
+        "//internal/observability:observability",
+        "//internal/client:client",
+        "//internal/context:context",
+    ],
+)

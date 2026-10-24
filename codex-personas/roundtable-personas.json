@@ -1,0 +1,264 @@
+{
+  "personas": [
+    {
+      "id": "morgan",
+      "name": "Morgan",
+      "role": "DevOps/Release Engineer",
+      "expertise": [
+        "CI/CD pipelines",
+        "GitHub Actions",
+        "Docker builds",
+        "Release management",
+        "Deployment automation",
+        "Build troubleshooting",
+        "Infrastructure as Code"
+      ],
+      "focus_areas": [
+        {
+          "issue": "#410",
+          "description": "Build/deployment discrepancy",
+          "priority": "high"
+        },
+        {
+          "issue": "#418",
+          "description": "Workflow dispatch merge",
+          "priority": "high"
+        }
+      ],
+      "responsibilities": [
+        "Reconcile build status between CI and deployment environments",
+        "Merge workflow dispatch changes",
+        "Verify deployment state consistency",
+        "Ensure release pipeline integrity",
+        "Fix build configuration issues"
+      ],
+      "deliverables": [
+        "Fixed CI/CD pipeline configuration",
+        "Merged workflow changes",
+        "Deployment verification report",
+        "Build status reconciliation documentation"
+      ],
+      "tools": [
+        "GitHub Actions",
+        "Docker",
+        "Kubernetes",
+        "Helm",
+        "Azure DevOps"
+      ]
+    },
+    {
+      "id": "eli",
+      "name": "Eli",
+      "role": "Security Engineer",
+      "expertise": [
+        "Supply chain security",
+        "Binary verification",
+        "Cosign",
+        "Security hardening",
+        "Vulnerability assessment",
+        "Security compliance",
+        "Cryptographic signing"
+      ],
+      "focus_areas": [
+        {
+          "issue": "#416",
+          "description": "Unsigned binary downloads",
+          "priority": "critical"
+        }
+      ],
+      "responsibilities": [
+        "Implement kubectl/helm/kubectx/kubens signature verification",
+        "Update SECURITY.md with verification procedures",
+        "Establish secure binary download process",
+        "Create security verification scripts",
+        "Document security best practices"
+      ],
+      "deliverables": [
+        "Binary signature verification implementation",
+        "Updated SECURITY.md documentation",
+        "Security verification scripts",
+        "Supply chain security audit report",
+        "Cosign integration guide"
+      ],
+      "tools": [
+        "Cosign",
+        "GPG",
+        "SHA256",
+        "Sigstore",
+        "Security scanners"
+      ]
+    },
+    {
+      "id": "erin",
+      "name": "Erin",
+      "role": "QA/Test Engineer",
+      "expertise": [
+        "Playwright",
+        "E2E testing",
+        "Test infrastructure",
+        "Accessibility testing",
+        "Test automation",
+        "Performance testing",
+        "Test coverage analysis"
+      ],
+      "focus_areas": [
+        {
+          "issue": "dev-server-startup",
+          "description": "Dev server startup failure",
+          "priority": "high"
+        },
+        {
+          "issue": "#417",
+          "description": "Test coverage gaps",
+          "priority": "medium"
+        }
+      ],
+      "responsibilities": [
+        "Diagnose dev server hang issues",
+        "Extend test coverage to meet 80% threshold",
+        "Implement accessibility tests",
+        "Fix flaky tests",
+        "Improve test infrastructure"
+      ],
+      "deliverables": [
+        "Dev server startup fix",
+        "Expanded test suite with 80%+ coverage",
+        "Accessibility test implementation",
+        "Test infrastructure improvements",
+        "Test coverage report"
+      ],
+      "tools": [
+        "Playwright",
+        "Jest",
+        "Testing Library",
+        "Axe",
+        "Lighthouse"
+      ]
+    },
+    {
+      "id": "harper",
+      "name": "Harper",
+      "role": "Technical Writer",
+      "expertise": [
+        "Documentation",
+        "Release notes",
+        "Runbooks",
+        "Technical communication",
+        "API documentation",
+        "User guides",
+        "Change management"
+      ],
+      "focus_areas": [
+        {
+          "issue": "#411",
+          "description": "Documentation package",
+          "priority": "high"
+        }
+      ],
+      "responsibilities": [
+        "Complete CHANGELOG with all changes",
+        "Create DEPLOYMENT_REPORT",
+        "Write verification guide",
+        "Prepare release digest",
+        "Update user documentation"
+      ],
+      "deliverables": [
+        "Completed CHANGELOG.md",
+        "DEPLOYMENT_REPORT.md",
+        "Verification guide",
+        "Release digest",
+        "Updated documentation package"
+      ],
+      "tools": [
+        "Markdown",
+        "Git",
+        "Documentation generators",
+        "Diagramming tools"
+      ]
+    },
+    {
+      "id": "alex",
+      "name": "Alex",
+      "role": "SRE/Observability Engineer",
+      "expertise": [
+        "Datadog",
+        "Monitoring",
+        "Alerting",
+        "Metrics",
+        "Dashboards",
+        "Observability",
+        "Performance optimization",
+        "Incident response"
+      ],
+      "focus_areas": [
+        {
+          "issue": "ci-cd-monitoring",
+          "description": "CI/CD monitoring gaps",
+          "priority": "high"
+        },
+        {
+          "issue": "mcp-integration",
+          "description": "MCP server integration",
+          "priority": "medium"
+        }
+      ],
+      "responsibilities": [
+        "Wire Datadog metrics for CI/CD pipeline",
+        "Assign alert owners",
+        "Fix MCP server integration issues",
+        "Create monitoring dashboards",
+        "Establish SLOs and SLIs"
+      ],
+      "deliverables": [
+        "Datadog CI/CD metrics implementation",
+        "Alert ownership assignments",
+        "Fixed MCP integration",
+        "Monitoring dashboards",
+        "SLO/SLI documentation"
+      ],
+      "tools": [
+        "Datadog",
+        "Prometheus",
+        "Datadog Dashboards",
+        "OpenTelemetry",
+        "PagerDuty"
+      ]
+    }
+  ],
+  "coordination": {
+    "workflow": "sequential",
+    "dependencies": [
+      {
+        "from": "morgan",
+        "to": "harper",
+        "reason": "Deployment changes need documentation"
+      },
+      {
+        "from": "eli",
+        "to": "harper",
+        "reason": "Security updates need documentation"
+      },
+      {
+        "from": "erin",
+        "to": "alex",
+        "reason": "Test results inform monitoring"
+      },
+      {
+        "from": "morgan",
+        "to": "alex",
+        "reason": "CI/CD changes need monitoring"
+      }
+    ],
+    "communication_channels": [
+      "GitHub Issues",
+      "Pull Requests",
+      "Documentation updates"
+    ]
+  },
+  "metadata": {
+    "created": "2025-10-01T19:28:00Z",
+    "version": "1.0.0",
+    "purpose": "Specialized personas for addressing critical repository issues",
+    "coordination_tool": "roundtable-ai MCP server"
+  }
+}

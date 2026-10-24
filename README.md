@@ -23,3 +23,17 @@ Each participating repository carries a `.project.toml` pointing back here.
 - [lower-bound-review](lower-bound-review/SKILL.md) — architecture gate before adding queues, schedulers, storage layers, FPGA blocks, RISC-V, or ASIC functions
 
 These skills operationalize the binding constraints in [docs/CONSTRAINTS.md](docs/CONSTRAINTS.md) and should be used before extending lower-bound storage or hardware work.
+
+
+## Skills imported from vibecode-webgui
+
+Moved from ryanmaclean/vibecode-webgui@129302a73be9719d213561116319d13ed679fd71 on 2026-10-24
+([import record](docs/imports/vibecode-webgui-2026-10-24.md)):
+
+- [datadog-operations](datadog-operations/SKILL.md) — Datadog APM/logs/metrics/RUM queries, monitors, dashboards, incidents (MIT, Datadog CLI Contributors)
+- [datadog-dashboard-ops](datadog-dashboard-ops/SKILL.md) — fetch, fix and push Datadog dashboards
+- [gastown-ops](gastown-ops/SKILL.md) — Gas Town bead lifecycle, Kafka, Airflow, rig coordination
+- [apple-silicon](apple-silicon/SKILL.md) — Metal/MLX/CoreML/Virtualization.framework tuning
+- [openrouter-models](openrouter-models/SKILL.md) — pick a working free OpenRouter model
+- [context-graph](context-graph/README.md) — codebase relationship graph builder
+- [codex-personas](codex-personas/PERSONAS_README.md) — roundtable MCP persona definitions
