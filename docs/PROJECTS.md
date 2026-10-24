@@ -47,7 +47,7 @@ This is the temporary cross-project registry until/unless a dedicated portfolio 
 
 | Repo | Status | Mirror of | Use |
 |---|---|---|---|
-| QNAS Gitea `studio/datadog-agent-FreeBSD` | mirror (after RFC 0006 migration) | `datadog-agent-freebsd` releases | LAN release-asset cache for fleet installs. Its legacy `master`/open PRs and `builds/ledger.jsonl` are frozen history; nothing new is written there first. |
+| QNAS Gitea `studio/datadog-agent-FreeBSD` | mirror (after RFC 0006 migration) | `datadog-agent-freebsd` releases | LAN release-asset cache for fleet installs. Its legacy `master`/open PRs and `builds/ledger.jsonl` are to be classified individually per RFC 0006 D5 (no blanket close or freeze) after an off-QNAS restore is proven; nothing new is written there first. |
 
 ## Ownership rule
 
