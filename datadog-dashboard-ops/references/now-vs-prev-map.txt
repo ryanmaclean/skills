@@ -1,0 +1,28 @@
+# title | metric | include_ai_agent
+Reaper Tasks (now vs prev)|gastown.reaper.tasks_completed|true
+Mayor Tasks Assigned (now vs prev)|gastown.mayor.task.count|true
+Deacon Health Checks (now vs prev)|gastown.deacon.health_checks|true
+Deacon Dogs Active (now vs prev)|gastown.deacon.dogs_active|true
+Witness Lifecycle Events (now vs prev)|gastown.witness.lifecycle_events|true
+Overseer Alerts (now vs prev)|gastown.overseer.alerts|true
+Crew Assignments (now vs prev)|gastown.crew.assign.count|true
+Crew Active (now vs prev)|gastown.crew.active|true
+Polecats Spawned (now vs prev)|gastown.polecats.spawned|true
+Polecats Completed (now vs prev)|gastown.polecats.completed|true
+Polecats Failed (now vs prev)|gastown.polecats.failed|true
+Mail Sent (now vs prev)|gastown.mail.sent|true
+Mail Read (now vs prev)|gastown.mail.read|true
+Nudges Sent (now vs prev)|gastown.nudges.sent|true
+Nudges Responded (now vs prev)|gastown.nudges.responded|true
+Failures (now vs prev)|gastown.failures.count|true
+GT Handoff (now vs prev)|gastown.handoff.count|true
+tmux Sessions (now vs prev)|gastown.tmux.sessions_active|true
+Convoy Started (now vs prev)|gastown.convoy.started|true
+Convoy Completed (now vs prev)|gastown.convoy.completed|true
+Merged Code (now vs prev)|gastown.refinery.merges_processed|true
+Issues Opened (now vs prev)|github.issues.open|false
+Issues Closed (now vs prev)|trace.main.merge_branch.hits|false
+PRs Opened (now vs prev)|gastown.polecat.prs_created|true
+PRs Closed (now vs prev)|gastown.refinery.merges_processed|true
+Branches Opened (now vs prev)|trace.main.merge_branch|false
+Branches Closed (now vs prev)|trace.main.merge_branch.hits|false

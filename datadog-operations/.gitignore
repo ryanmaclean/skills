@@ -1,0 +1,77 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyo
+
+# Virtual environment
+.venv/
+venv/
+ENV/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Test artifacts
+tests/*.log
+tests/*.out
+*.log
+*.out
+
+# Build artifacts
+dist/
+build/
+*.exe
+*.dll
+*.so
+*.dylib
+*.a
+
+# Dependencies
+node_modules/
+vendor/
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+credentials.json
+secrets.yml
+secrets.yaml
+
+# Temporary files
+*.tmp
+*.bak
+.~*
+
+# Coverage reports
+coverage/
+*.coverprofile
+htmlcov/
+.coverage
+
+# Override parent .gitignore for python/lib/ which contains our library code
+!python/lib/
+
+# Override parent .gitignore for .claude/skills/ which contains Claude Code skill definitions
+!.claude/
+!.claude/skills/
+!.claude/skills/**
+
+
+# Go compiled binaries (distribute via GitHub Releases)
+datadog-skill-go/bin/datadog-cli*
+!datadog-skill-go/bin/.gitkeep

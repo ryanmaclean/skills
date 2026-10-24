@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Datadog Support
+    url: https://docs.datadoghq.com/help/
+    about: For questions about Datadog itself (not this tool), contact Datadog support
+  - name: Datadog API Documentation
+    url: https://docs.datadoghq.com/api/latest/
+    about: Official Datadog API documentation
+  - name: Discussions
+    url: https://github.com/ryanmaclean/dd-skill-test/discussions
+    about: Ask questions and discuss with the community

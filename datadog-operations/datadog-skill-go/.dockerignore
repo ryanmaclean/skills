@@ -1,0 +1,63 @@
+# Git
+.git
+.gitignore
+.github
+
+# Documentation
+*.md
+docs/
+*.txt
+
+# Build artifacts
+bin/
+dist/
+dd
+*.exe
+
+# Test files
+*_test.go
+testdata/
+
+# Coverage reports
+*.out
+*.html
+coverage/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.log
+
+# CI/CD
+.travis.yml
+.gitlab-ci.yml
+Jenkinsfile
+
+# Slides and presentations
+*.pptx
+*.png
+*.pdf
+slide_*.png
+
+# Project metadata
+PROJECT-*.md
+ITERATION-*.md
+VALIDATION-*.md
+GO-IMPLEMENTATION-*.md
+
+# Build tools
+Makefile
+pants.toml
+
+# Test data
+test-*.json

@@ -1,0 +1,336 @@
+# GitHub Actions Workflow: Deploy with Datadog Safety Checks
+#
+# This workflow demonstrates how to integrate Datadog CLI safety checks
+# into your deployment pipeline.
+#
+# Place this file in: .github/workflows/deploy.yml
+
+name: Deploy with Datadog Safety Checks
+
+on:
+  push:
+    branches: [ main, production ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - staging
+        - production
+
+env:
+  SERVICE_NAME: api-service  # Change to your service name
+
+jobs:
+  datadog-pre-deployment-check:
+    name: Pre-Deployment Safety Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Datadog CLI
+        run: |
+          # Download and install Datadog CLI
+          curl -L https://github.com/yourusername/datadog-cli-go/releases/latest/download/dd-linux-amd64 -o dd
+          chmod +x dd
+          sudo mv dd /usr/local/bin/
+          dd version
+
+      - name: Configure Datadog credentials
+        run: |
+          echo "DD_API_KEY configured"
+          echo "DD_APP_KEY configured"
+        env:
+          DD_API_KEY: ${{ secrets.DD_API_KEY }}
+          DD_APP_KEY: ${{ secrets.DD_APP_KEY }}
+          DD_SITE: ${{ secrets.DD_SITE || 'datadoghq.com' }}
+
+      - name: Check service health
+        id: health_check
+        continue-on-error: true
+        run: |
+          echo "Checking service health..."
+          dd health ${{ env.SERVICE_NAME }} --json > health.json
+
+          STATUS=$(jq -r '.status' health.json)
+          ERROR_RATE=$(jq -r '.error_rate' health.json)
+
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+          echo "error_rate=$ERROR_RATE" >> $GITHUB_OUTPUT
+
+          if [ "$STATUS" != "healthy" ]; then
+            echo "::warning::Service is $STATUS"
+            exit 1
+          fi
+        env:
+          DD_API_KEY: ${{ secrets.DD_API_KEY }}
+          DD_APP_KEY: ${{ secrets.DD_APP_KEY }}
+
+      - name: Check for active incidents
+        id: incidents_check
+        continue-on-error: true
+        run: |
+          echo "Checking for active incidents..."
+          dd incidents list --status active --service ${{ env.SERVICE_NAME }} --json > incidents.json
+
+          INCIDENT_COUNT=$(jq '. | length' incidents.json)
+          echo "incident_count=$INCIDENT_COUNT" >> $GITHUB_OUTPUT
+
+          if [ "$INCIDENT_COUNT" -gt 0 ]; then
+            echo "::error::$INCIDENT_COUNT active incident(s) found"
+            jq -r '.[] | "- [\(.severity)] \(.title)"' incidents.json
+            exit 1
+          fi
+        env:
+          DD_API_KEY: ${{ secrets.DD_API_KEY }}
+          DD_APP_KEY: ${{ secrets.DD_APP_KEY }}
+
+      - name: Run deployment safety check
+        id: deploy_check
+        run: |
+          echo "Running comprehensive deployment safety check..."
+
+          if dd deploy ${{ env.SERVICE_NAME }} --environment ${{ inputs.environment || 'production' }}; then
+            echo "result=safe" >> $GITHUB_OUTPUT
+            echo "✅ Safe to deploy"
+          else
+            EXIT_CODE=$?
+            if [ $EXIT_CODE -eq 2 ]; then
+              echo "result=warning" >> $GITHUB_OUTPUT
+              echo "::warning::Deployment has warnings but can proceed"
+            else
+              echo "result=unsafe" >> $GITHUB_OUTPUT
+              echo "::error::Unsafe to deploy"
+              exit 1
+            fi
+          fi
+        env:
+          DD_API_KEY: ${{ secrets.DD_API_KEY }}
+          DD_APP_KEY: ${{ secrets.DD_APP_KEY }}
+
+      - name: Check SLO compliance
+        id: slo_check
+        continue-on-error: true
+        run: |
+          echo "Checking SLO compliance..."
+          dd slos --json > slos.json
+
+          COMPLIANCE=$(jq -r '.overall_compliance' slos.json || echo "100")
+          echo "compliance=$COMPLIANCE" >> $GITHUB_OUTPUT
+
+          if (( $(echo "$COMPLIANCE < 99.0" | bc -l) )); then
+            echo "::warning::SLO compliance is $COMPLIANCE% (below 99%)"
+          fi
+        env:
+          DD_API_KEY: ${{ secrets.DD_API_KEY }}
+          DD_APP_KEY: ${{ secrets.DD_APP_KEY }}
+
+      - name: Upload Datadog reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: datadog-pre-deploy-reports
+          path: |
+            health.json
+            incidents.json
+            slos.json
+
+      - name: Post safety check summary
+        if: always()
+        run: |
+          echo "## 🐶 Datadog Pre-Deployment Safety Check" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Service:** ${{ env.SERVICE_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** ${{ inputs.environment || 'production' }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Results" >> $GITHUB_STEP_SUMMARY
+          echo "- **Health Status:** ${{ steps.health_check.outputs.status || 'unknown' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Error Rate:** ${{ steps.health_check.outputs.error_rate || '0' }}%" >> $GITHUB_STEP_SUMMARY
+          echo "- **Active Incidents:** ${{ steps.incidents_check.outputs.incident_count || '0' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **SLO Compliance:** ${{ steps.slo_check.outputs.compliance || 'N/A' }}%" >> $GITHUB_STEP_SUMMARY
+          echo "- **Deploy Safety:** ${{ steps.deploy_check.outputs.result || 'unknown' }}" >> $GITHUB_STEP_SUMMARY
+
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    needs: datadog-pre-deployment-check
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build application
+        run: |
+          echo "Building application..."
+          # Your build commands here
+          # make build
+          # docker build -t myapp:${{ github.sha }} .
+
+      - name: Run tests
+        run: |
+          echo "Running tests..."
+          # Your test commands here
+          # make test
+          # npm test
+
+  deploy:
+    name: Deploy to ${{ inputs.environment || 'production' }}
+    runs-on: ubuntu-latest
+    needs: [datadog-pre-deployment-check, build]
+    environment: ${{ inputs.environment || 'production' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy application
+        run: |
+          echo "Deploying to ${{ inputs.environment || 'production' }}..."
+          # Your deployment commands here
+          # kubectl apply -f k8s/
+          # aws deploy push...
+
+      - name: Create Datadog deployment marker
+        run: |
+          # Install Datadog CLI if not cached
+          if ! command -v dd &> /dev/null; then
+            curl -L https://github.com/yourusername/datadog-cli-go/releases/latest/download/dd-linux-amd64 -o dd
+            chmod +x dd
+            sudo mv dd /usr/local/bin/
+          fi
+
+          # Record deployment in Datadog
+          # This helps with deployment tracking and correlation
+          echo "Recording deployment marker in Datadog..."
+        env:
+          DD_API_KEY: ${{ secrets.DD_API_KEY }}
+          DD_APP_KEY: ${{ secrets.DD_APP_KEY }}
+
+  datadog-post-deployment-check:
+    name: Post-Deployment Validation
+    runs-on: ubuntu-latest
+    needs: deploy
+
+    steps:
+      - name: Install Datadog CLI
+        run: |
+          curl -L https://github.com/yourusername/datadog-cli-go/releases/latest/download/dd-linux-amd64 -o dd
+          chmod +x dd
+          sudo mv dd /usr/local/bin/
+
+      - name: Wait for deployment to stabilize
+        run: |
+          echo "Waiting 60 seconds for deployment to stabilize..."
+          sleep 60
+
+      - name: Verify service health post-deployment
+        id: post_health_check
+        run: |
+          echo "Verifying service health after deployment..."
+
+          for i in {1..5}; do
+            echo "Health check attempt $i/5..."
+
+            if dd health ${{ env.SERVICE_NAME }} --json > post-health.json; then
+              STATUS=$(jq -r '.status' post-health.json)
+              ERROR_RATE=$(jq -r '.error_rate' post-health.json)
+
+              echo "Status: $STATUS, Error Rate: $ERROR_RATE%"
+
+              if [ "$STATUS" = "healthy" ]; then
+                echo "✅ Deployment successful - service is healthy"
+                exit 0
+              fi
+            fi
+
+            if [ $i -lt 5 ]; then
+              echo "Service not healthy yet, waiting 30s..."
+              sleep 30
+            fi
+          done
+
+          echo "::error::Service failed to become healthy after deployment"
+          exit 1
+        env:
+          DD_API_KEY: ${{ secrets.DD_API_KEY }}
+          DD_APP_KEY: ${{ secrets.DD_APP_KEY }}
+
+      - name: Check for new errors
+        run: |
+          echo "Checking for new errors after deployment..."
+
+          dd logs --service ${{ env.SERVICE_NAME }} --status error --from 5m --json > post-errors.json
+
+          ERROR_COUNT=$(jq '. | length' post-errors.json)
+
+          if [ "$ERROR_COUNT" -gt 10 ]; then
+            echo "::warning::$ERROR_COUNT errors detected in last 5 minutes"
+            echo "Recent errors:"
+            jq -r '.[] | "- \(.message)"' post-errors.json | head -5
+          else
+            echo "✅ Error count acceptable ($ERROR_COUNT errors)"
+          fi
+        env:
+          DD_API_KEY: ${{ secrets.DD_API_KEY }}
+          DD_APP_KEY: ${{ secrets.DD_APP_KEY }}
+
+      - name: Monitor for anomalies
+        run: |
+          echo "Checking Watchdog for post-deployment anomalies..."
+
+          dd watchdog --service ${{ env.SERVICE_NAME }} --from 10m --json > watchdog.json
+
+          ANOMALY_COUNT=$(jq '. | length' watchdog.json || echo "0")
+
+          if [ "$ANOMALY_COUNT" -gt 0 ]; then
+            echo "::warning::Watchdog detected $ANOMALY_COUNT anomaly/anomalies"
+          else
+            echo "✅ No anomalies detected"
+          fi
+        env:
+          DD_API_KEY: ${{ secrets.DD_API_KEY }}
+          DD_APP_KEY: ${{ secrets.DD_APP_KEY }}
+
+      - name: Post deployment summary
+        if: always()
+        run: |
+          echo "## 🚀 Post-Deployment Validation" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Deployment to ${{ inputs.environment || 'production' }} completed." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "View in Datadog: https://app.datadoghq.com/apm/services/${{ env.SERVICE_NAME }}" >> $GITHUB_STEP_SUMMARY
+
+  rollback:
+    name: Rollback if needed
+    runs-on: ubuntu-latest
+    needs: datadog-post-deployment-check
+    if: failure()
+
+    steps:
+      - name: Create incident
+        run: |
+          # Install Datadog CLI
+          curl -L https://github.com/yourusername/datadog-cli-go/releases/latest/download/dd-linux-amd64 -o dd
+          chmod +x dd
+          sudo mv dd /usr/local/bin/
+
+          # Create incident for failed deployment
+          dd incidents create \
+            --title "Deployment failed for ${{ env.SERVICE_NAME }}" \
+            --severity SEV-2 \
+            --service ${{ env.SERVICE_NAME }} \
+            --customer-impact "Deployment validation failed, potential service degradation"
+        env:
+          DD_API_KEY: ${{ secrets.DD_API_KEY }}
+          DD_APP_KEY: ${{ secrets.DD_APP_KEY }}
+
+      - name: Trigger rollback
+        run: |
+          echo "::error::Deployment validation failed - initiating rollback"
+          # Your rollback commands here
+          # kubectl rollout undo deployment/myapp

@@ -1,0 +1,80 @@
+{
+    "version": "0.1.0",
+    "description": "Fast, single-binary Datadog CLI written in Go - 67x faster than Python",
+    "homepage": "https://github.com/yourusername/datadog-cli-go",
+    "license": "Apache-2.0",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/yourusername/datadog-cli-go/releases/download/v0.1.0/dd-windows-amd64.exe",
+            "hash": "UPDATE_WITH_SHA256_CHECKSUM",
+            "bin": [
+                [
+                    "dd-windows-amd64.exe",
+                    "dd"
+                ]
+            ]
+        },
+        "32bit": {
+            "url": "https://github.com/yourusername/datadog-cli-go/releases/download/v0.1.0/dd-windows-386.exe",
+            "hash": "UPDATE_WITH_SHA256_CHECKSUM",
+            "bin": [
+                [
+                    "dd-windows-386.exe",
+                    "dd"
+                ]
+            ]
+        },
+        "arm64": {
+            "url": "https://github.com/yourusername/datadog-cli-go/releases/download/v0.1.0/dd-windows-arm64.exe",
+            "hash": "UPDATE_WITH_SHA256_CHECKSUM",
+            "bin": [
+                [
+                    "dd-windows-arm64.exe",
+                    "dd"
+                ]
+            ]
+        }
+    },
+    "checkver": {
+        "url": "https://api.github.com/repos/yourusername/datadog-cli-go/releases/latest",
+        "jsonpath": "$.tag_name",
+        "regex": "v([\\d.]+)"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/yourusername/datadog-cli-go/releases/download/v$version/dd-windows-amd64.exe"
+            },
+            "32bit": {
+                "url": "https://github.com/yourusername/datadog-cli-go/releases/download/v$version/dd-windows-386.exe"
+            },
+            "arm64": {
+                "url": "https://github.com/yourusername/datadog-cli-go/releases/download/v$version/dd-windows-arm64.exe"
+            }
+        }
+    },
+    "notes": [
+        "Datadog CLI has been installed as 'dd'.",
+        "",
+        "To use the CLI, set your Datadog credentials:",
+        "  $env:DD_API_KEY = \"your_datadog_api_key\"",
+        "  $env:DD_APP_KEY = \"your_datadog_app_key\"",
+        "",
+        "Get your API keys from:",
+        "  https://app.datadoghq.com/organization-settings/api-keys",
+        "",
+        "Quick start:",
+        "  dd context          # Auto-detect service",
+        "  dd health           # Check service health",
+        "  dd apm              # View APM traces",
+        "  dd --help           # Show all commands",
+        "",
+        "Documentation:",
+        "  https://github.com/yourusername/datadog-cli-go",
+        "",
+        "Performance:",
+        "  - 67x faster startup than Python (3ms vs 200ms)",
+        "  - 67% less memory (10MB vs 30MB)",
+        "  - Single binary, zero dependencies"
+    ]
+}

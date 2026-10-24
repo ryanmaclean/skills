@@ -1,0 +1,88 @@
+name: Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-bash:
+    name: Test Bash Scripts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq bc curl
+
+      - name: Validate bash syntax
+        run: |
+          for script in scripts/*.sh; do
+            echo "Checking $script"
+            bash -n "$script" || exit 1
+          done
+
+  test-python:
+    name: Test Python Scripts
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11', '3.12']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Validate Python syntax
+        run: |
+          python -m py_compile python/*.py
+          python -m py_compile python/lib/*.py
+
+  test-go:
+    name: Test Go CLI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Build Go CLI
+        run: |
+          cd datadog-skill-go
+          go build -v ./...
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lint shell scripts
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: './scripts'
+          ignore_paths: '.venv node_modules'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Lint Python
+        run: |
+          pip install flake8
+          flake8 python/ --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=.venv

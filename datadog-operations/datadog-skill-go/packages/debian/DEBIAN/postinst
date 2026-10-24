@@ -1,0 +1,43 @@
+#!/bin/bash
+# Post-installation script for datadog-cli
+
+set -e
+
+# Ensure shell completion directories exist
+mkdir -p /etc/bash_completion.d
+mkdir -p /usr/share/zsh/vendor-completions
+
+# Set correct permissions
+chmod 644 /etc/bash_completion.d/dd 2>/dev/null || true
+chmod 644 /usr/share/zsh/vendor-completions/_dd 2>/dev/null || true
+
+echo ""
+echo "========================================="
+echo "Datadog CLI installed successfully!"
+echo "========================================="
+echo ""
+echo "The 'dd' command is now available."
+echo ""
+echo "To use the CLI, set your Datadog credentials:"
+echo "  export DD_API_KEY=\"your_datadog_api_key\""
+echo "  export DD_APP_KEY=\"your_datadog_app_key\""
+echo ""
+echo "Get your API keys from:"
+echo "  https://app.datadoghq.com/organization-settings/api-keys"
+echo ""
+echo "Shell completions have been installed for bash and zsh."
+echo "Restart your shell or run:"
+echo "  source /etc/bash_completion.d/dd  # bash"
+echo "  compinit                          # zsh"
+echo ""
+echo "Quick start:"
+echo "  dd context          # Auto-detect service"
+echo "  dd health           # Check service health"
+echo "  dd apm              # View APM traces"
+echo "  dd --help           # Show all commands"
+echo ""
+echo "Documentation:"
+echo "  https://github.com/yourusername/datadog-cli-go"
+echo ""
+
+exit 0

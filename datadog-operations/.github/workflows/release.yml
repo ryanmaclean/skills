@@ -1,0 +1,95 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Go Binaries
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Build binaries
+        run: |
+          cd datadog-skill-go
+
+          # macOS Apple Silicon
+          GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" -o bin/datadog-cli-darwin-arm64 cmd/main.go
+
+          # macOS Intel
+          GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -o bin/datadog-cli-darwin-amd64 cmd/main.go
+
+          # Linux x64
+          GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o bin/datadog-cli-linux-amd64 cmd/main.go
+
+          # Linux ARM
+          GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" -o bin/datadog-cli-linux-arm64 cmd/main.go
+
+          # Windows x64
+          GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o bin/datadog-cli-windows-amd64.exe cmd/main.go
+
+          # Windows ARM
+          GOOS=windows GOARCH=arm64 go build -ldflags="-s -w" -o bin/datadog-cli-windows-arm64.exe cmd/main.go
+
+      - name: Generate checksums
+        run: |
+          cd datadog-skill-go/bin
+          sha256sum datadog-cli-* > checksums.txt
+          cat checksums.txt
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            datadog-skill-go/bin/datadog-cli-darwin-arm64
+            datadog-skill-go/bin/datadog-cli-darwin-amd64
+            datadog-skill-go/bin/datadog-cli-linux-amd64
+            datadog-skill-go/bin/datadog-cli-linux-arm64
+            datadog-skill-go/bin/datadog-cli-windows-amd64.exe
+            datadog-skill-go/bin/datadog-cli-windows-arm64.exe
+            datadog-skill-go/bin/checksums.txt
+          body: |
+            ## Datadog Operations Skill ${{ github.ref_name }}
+
+            Complete Datadog automation toolkit with bash, Python, and Go implementations.
+
+            ### Installation
+
+            **macOS (Apple Silicon):**
+            ```bash
+            curl -L https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/datadog-cli-darwin-arm64 -o /usr/local/bin/datadog-cli
+            chmod +x /usr/local/bin/datadog-cli
+            ```
+
+            **Linux (x64):**
+            ```bash
+            curl -L https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/datadog-cli-linux-amd64 -o /usr/local/bin/datadog-cli
+            chmod +x /usr/local/bin/datadog-cli
+            ```
+
+            **Windows:**
+            Download `datadog-cli-windows-amd64.exe` from the assets below.
+
+            ### Verification
+
+            Verify your download with SHA256 checksums:
+            ```bash
+            sha256sum -c checksums.txt
+            ```
+
+            See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for full release notes.
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

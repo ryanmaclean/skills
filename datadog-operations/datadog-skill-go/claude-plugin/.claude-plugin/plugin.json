@@ -1,0 +1,8 @@
+{
+  "name": "datadog-cli",
+  "description": "Datadog observability platform CLI - query APM, logs, metrics, incidents, monitors, and more. Built with production-grade Go CLI wrapping 22 Datadog API operations.",
+  "author": {
+    "name": "Ryan MacLean",
+    "email": "ryan.maclean@anthropic.com"
+  }
+}

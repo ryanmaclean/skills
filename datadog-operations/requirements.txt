@@ -1,0 +1,5 @@
+# Python dependencies for Datadog Skill
+# Core dependencies
+requests>=2.31.0
+python-dateutil>=2.8.2
+gitpython>=3.1.40

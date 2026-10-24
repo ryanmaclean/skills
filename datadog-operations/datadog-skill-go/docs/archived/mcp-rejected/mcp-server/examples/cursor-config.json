@@ -1,0 +1,14 @@
+{
+  "name": "datadog",
+  "description": "Datadog observability via MCP - access health checks, APM traces, logs, and incidents",
+  "command": "node",
+  "args": [
+    "/absolute/path/to/datadog-skill-go/mcp-server/dist/index.js"
+  ],
+  "env": {
+    "DD_API_KEY": "your_datadog_api_key_here",
+    "DD_APP_KEY": "your_datadog_app_key_here",
+    "DD_SITE": "datadoghq.com",
+    "DD_CLI_PATH": "/absolute/path/to/datadog-skill-go/bin/dd-darwin-arm64"
+  }
+}
