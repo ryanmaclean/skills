@@ -25,6 +25,7 @@ Initial producers:
 - agent-jail isolation comparisons
 - Moth worker footprint measurements
 - autoresearch experiment loops
+- port-eval arms (`nu scripts/port-eval.nu bench <spec> <result>`; workload `port-eval:<spec-id>@<ref>`, see `port-eval/SKILL.md`)
 
 ## Core dimensions
 
