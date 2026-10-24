@@ -1,0 +1,22 @@
+name: durable-tid record v0 fixtures
+
+on:
+  push:
+    paths:
+      - "scaffolds/durable-tid/**"
+  pull_request:
+    paths:
+      - "scaffolds/durable-tid/**"
+
+jobs:
+  verify-fixtures:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Regenerate v0 fixtures and diff against checked-in copies
+        run: |
+          set -eu
+          cd scaffolds/durable-tid/fixtures
+          cp -r . /tmp/fixtures-checked-in
+          ./generate.sh
+          diff -ru /tmp/fixtures-checked-in . && echo "fixtures reproducible: OK"
