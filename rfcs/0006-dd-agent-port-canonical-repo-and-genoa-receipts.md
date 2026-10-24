@@ -3,6 +3,16 @@
 Status: Proposed (the owner decides; see "Owner decisions")  
 Date: 2026-09-24
 
+## Update 2026-10-24 (status refresh; no decision is taken here)
+
+This section records what changed since the 2026-09-24 evidence. It is dated, it changes no proposal, and it does not record any owner decision. D1-D6 remain open.
+
+- **Counts are stale.** The 22 QNAS releases and 32 open PRs above are the 2026-09-24 figures. The owner's 2026-09-30 review comment on this PR cites a later saved snapshot of 55 open QNAS PRs. Re-measure both before acting on any number in this RFC. GitHub `datadog-agent-freebsd` has since published newer releases, including aarch64 builds (for example `v7.83.3-freebsd-r3.4-pr158-aarch64` and `v7.84.5-freebsd-r1-aarch64`), so the GitHub release set is no longer the five listed under Problem item 2.
+- **A third port repo exists.** GitHub `ryanmaclean/datadog-agent-rs` (a Rust Datadog Agent for the BSDs) is active. Its README says it is ported incrementally from the Go port's native-check work (`studio/datadog-agent-FreeBSD` PRs #41/#42). It has no `.project.toml` and no registry row. **This PR deliberately adds no row for it:** no registry or `.project.toml` text assigns its ownership, and an ownership fact must come from the owner (see D7).
+- **Hosts.** Several build/test hosts named in legacy ledgers have been retired and others are being provisioned. No registry document names them, and host names stay out of this public registry (the RFC already keeps converted ledgers off this repo). Receipt `subject` and host fields must use the fleet hostname rules in Appendix A, not a retired host's name.
+- **D5 is narrowed (owner review, 2026-09-30).** D5 must not be executed as a blanket close/freeze of QNAS `master` and its PRs. Before any closure or relabeling: (1) prove a complete off-QNAS Gitea application, database, repos and data restore; (2) copy and read back exact release bytes; (3) classify each open PR's head, base and review history individually. Genoa receipts or a Git mirror do not replace the application backup. D1, D2, D3 and D6 stay conditional on verified asset mapping, permitted selected-tool licences, and fleet install/rollback canaries.
+- **Datadog agent deploys are out of scope here.** This docs-only PR performs no migration and touches no deployment.
+
 ## Problem
 
 The registry, the port repos and the receipt logs disagree about who owns what. The evidence below was collected on 2026-09-24 from the repos and ledgers themselves.
@@ -103,8 +113,9 @@ The converter and the converted data stay off this public repo because they cont
 | D2 | Where the bytes of the deployed binaries that exist only on QNAS go | Upload them to the GitHub releases, for deployed releases only. That gives two copies, one of them off the LAN. |
 | D3 | Where the Genoa receipt log lives | A new **private** Genoa-owned repo (e.g. `genoa-receipts`). `genoa` is public, and receipts name LAN hosts and backup paths. Rejected alternatives: redacted receipts in public `genoa` (they lose evidence) and a `receipts/` directory in the port repo (a second owner, which violates C1). |
 | D4 | Whether a private repo's name may appear in this public registry | Yes, the name only (no URLs or hosts). C1 needs the row. |
-| D5 | The QNAS legacy `master` and its 32 open PRs | Freeze them as history: close the PRs with a pointer to GitHub, archive the branch, never merge. |
+| D5 | The QNAS legacy `master` and its open PRs | **Revised 2026-10-24 per the 2026-09-30 owner review: not a blanket freeze.** First prove a full off-QNAS Gitea restore and exact release-byte read-back, then classify each PR individually (head, base, review history). Only after that may any be closed with a pointer to GitHub or the branch archived. |
 | D6 | The `mirror` lifecycle value | Accept it. `maintenance` would suggest the repo still owns something. |
+| D7 | Registry status and ownership of `datadog-agent-rs` (Rust Datadog Agent for the BSDs) | Owner to state. No ownership text exists in the registry or the repo (`.project.toml` absent); this PR adds no row until the owner decides. |
 
 ## Appendix A — `genoa.receipt.v1` JSON Schema (proposed; its home is Genoa)
 
