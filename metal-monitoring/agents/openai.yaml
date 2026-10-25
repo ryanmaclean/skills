@@ -1,0 +1,4 @@
+interface:
+  display_name: "Metal Monitoring"
+  short_description: "Validate Metal/DCGM metrics across hosts."
+  default_prompt: "Check Metal/DCGM ingestion by host and summarize missing or stale metrics."

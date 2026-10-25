@@ -1,0 +1,4 @@
+interface:
+  display_name: "TRIZ MLX Roadmap"
+  short_description: "TRIZ planning for MLX roadmaps"
+  default_prompt: "Apply TRIZ to choose and sequence next MLX model conversions and benchmarks."

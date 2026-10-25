@@ -1,0 +1,4 @@
+interface:
+  display_name: "Deming PDSA"
+  short_description: "Run Plan-Do-Study-Act loops with proof gates"
+  default_prompt: "Run a PDSA cycle with measurable gates and standard work updates."

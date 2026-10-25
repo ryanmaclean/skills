@@ -1,0 +1,4 @@
+interface:
+  display_name: "Paperclip Loop Nudge"
+  short_description: "Nudge Paperclip loops with better task inputs and routing."
+  default_prompt: "Prepare and nudge Paperclip tasks so heartbeat agents execute deterministically and close issues."
