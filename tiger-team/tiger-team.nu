@@ -54,7 +54,13 @@ def main [
   }
 
   # ── Build per-role prompts ─────────────────────────────────────────────
-  let role_prompts = ($roles | each { |r| role-persona $r $problem })
+  # Auto-inject proveryay claims template (idempotent)
+  let _tpl_path = ($env.HOME | path join ".claude/skills/proveryay/CLAIMS-TEMPLATE.md")
+  let _claims_tpl = (try { open --raw $_tpl_path } catch { "" })
+  let role_prompts = ($roles | each { |r|
+    let p = (role-persona $r $problem)
+    if ($p | str contains "<claims>") or ($_claims_tpl | is-empty) { $p } else { $"($p)\n\n($_claims_tpl)" }
+  })
 
   let roles_str = ($roles | str join ', ')
   print $"Tiger team: ($n) specialist\(s\) [($roles_str)] on: ($problem)"

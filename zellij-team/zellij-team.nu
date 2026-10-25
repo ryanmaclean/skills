@@ -50,7 +50,11 @@ def main [
   # ── Build agent command ──────────────────────────────────────────────────
   let effort_flag = if $effort == "" { "" } else { $"--effort ($effort)" }
 
-  def agent_cmd [task: string] {
+  def agent_cmd [task_in: string] {
+    # Auto-inject proveryay claims template (idempotent)
+    let tpl_path = ($env.HOME | path join ".claude/skills/proveryay/CLAIMS-TEMPLATE.md")
+    let tpl = (try { open --raw $tpl_path } catch { "" })
+    let task = if ($task_in | str contains "<claims>") or ($tpl | is-empty) { $task_in } else { $"($task_in)\n\n($tpl)" }
     # Escape single quotes in task for shell safety
     let safe_task = ($task | str replace --all "'" "'\"'\"'")
     if $effort_flag == "" {

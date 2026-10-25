@@ -47,7 +47,11 @@ def main [
   # ── Helper: build claude command ───────────────────────────────────────────
   let effort_flag = if $effort == "" { "" } else { $" --effort ($effort)" }
 
-  def agent_cmd [role: string, prompt: string] {
+  def agent_cmd [role: string, prompt_in: string] {
+    # Auto-inject proveryay claims template (idempotent)
+    let tpl_path = ($env.HOME | path join ".claude/skills/proveryay/CLAIMS-TEMPLATE.md")
+    let tpl = (try { open --raw $tpl_path } catch { "" })
+    let prompt = if ($prompt_in | str contains "<claims>") or ($tpl | is-empty) { $prompt_in } else { $"($prompt_in)\n\n($tpl)" }
     let safe_prompt = ($prompt | str replace --all "'" "'\"'\"'")
     $"claude --dangerously-skip-permissions --permission-mode ($mode)($effort_flag) -p '($safe_prompt)'"
   }

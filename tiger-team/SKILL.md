@@ -69,3 +69,32 @@ Specialists open in a **new Zellij tab** named `tiger-<timestamp>`:
 
 Same as zellij-team: workers run with `--dangerously-skip-permissions --permission-mode bypassPermissions`.
 You are watching and can ctrl-c any pane.
+
+## Verification contract (auto-injected by proveryay)
+
+Every agent dispatched through this skill receives the following appended
+to its prompt automatically:
+
+<see ~/.claude/skills/proveryay/CLAIMS-TEMPLATE.md — injected verbatim>
+
+This means **every agent MUST emit a `<claims>` block when it makes any
+deployment/state-change assertion.** The proveryay SubagentStop hook will
+verify each claim in parallel and inject structured verdicts into the
+dispatcher's next-turn context.
+
+If the agent's work is purely planning / research / narrative (no state
+changes), the agent may omit the `<claims>` block. Proveryay treats absence
+as silent (no noise).
+
+Invocation example with template injection:
+
+```nu
+# Prompt injection: template auto-appended (idempotent)
+let tpl = (open --raw ~/.claude/skills/proveryay/CLAIMS-TEMPLATE.md)
+let prompt = if ($prompt | str contains "<claims>") { $prompt } else { $"($prompt)\n\n($tpl)" }
+```
+
+See:
+- `~/.claude/skills/proveryay/SKILL.md` — hook behavior
+- `~/.claude/skills/proveryay/CLAIMS-TEMPLATE.md` — canonical format
+- `~/.claude/skills/fleet-eval/SKILL.md` — probe taxonomy
