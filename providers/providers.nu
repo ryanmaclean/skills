@@ -240,8 +240,8 @@ def show_gemini [data: record] {
   }
 
   # Group by model type, find minimum remainingFraction per group
-  let pro_entries = ($entries | where { |e| "modelId" in $e and ($e.modelId | str downcase | str contains "pro") })
-  let flash_entries = ($entries | where { |e| "modelId" in $e and ($e.modelId | str downcase | str contains "flash") })
+  let pro_entries = ($entries | where { |e| "modelId" in $e and ($e.modelId | str lowercase | str contains "pro") })
+  let flash_entries = ($entries | where { |e| "modelId" in $e and ($e.modelId | str lowercase | str contains "flash") })
 
   let earliest_reset = (
     $entries
