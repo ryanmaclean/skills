@@ -1,6 +1,6 @@
 ---
 name: kubernetes
-description: Kubernetes cluster management with k9s, kubectx, and kubectl-ai
+description: Kubernetes cluster management with k9s, kubectx, and kubectl-ai. Use when switching contexts, inspecting pods, or managing k8s clusters — especially with AI-assisted kubectl.
 ---
 
 # Kubernetes Management Skill

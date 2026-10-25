@@ -1,6 +1,6 @@
 ---
 name: mister-forum
-description: Browse and search MiSTer FPGA forum (misterfpga.org) efficiently via SearXNG cache
+description: Browse and search the MiSTer FPGA forum (misterfpga.org) efficiently via SearXNG cache. Use when looking up MiSTer forum threads, core discussions, or FPGA community answers without hitting the forum directly.
 trigger: mister forum, misterfpga, fpga forum, core status, mister news, mister development
 ---
 

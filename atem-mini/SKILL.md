@@ -1,6 +1,6 @@
 ---
 name: atem-mini
-description: Manage webcam streaming from an ATEM Mini connected to Raspberry Pis. Covers USB-C webcam capture (macOS avfoundation, Linux v4l2), HDMI input switching via the ATEM network protocol (UDP 9910), programmatic control with a raw-socket Python script (MIT/BSD only), Ansible playbooks for fleet input switching, and IRC bot command dispatch.
+description: Manage webcam streaming from an ATEM Mini connected to Raspberry Pis — USB-C webcam capture (macOS avfoundation, Linux v4l2), HDMI input switching via the ATEM network protocol (UDP 9910), raw-socket Python control, Ansible playbooks, and IRC bot dispatch. Use when switching ATEM inputs, streaming Pi webcams, or debugging HDMI/USB video paths.
 trigger: atem, atem mini, blackmagic, hdmi switch, webcam switch, video switcher, fleet dashboard, pi console
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: fleet-eval
-description: Verify a claim against reality. Dispatch when another agent reports "X works / ships / lands / is deployed" and you need independent proof before relying on that claim. Shapes every claim into a structured {subject, expected, probe, evidence, verdict}.
+description: Verify a claim against reality — shapes assertions into {subject, expected, probe, evidence, verdict} and runs independent probes. Use when another agent reports X works/ships/is deployed and proof is needed before trusting it, or when the user says verify this claim or fleet-eval.
 trigger: verify claim, prove it works, is X actually up, smoke test, verification, reality check, claim proof, did it really ship
 ---
 

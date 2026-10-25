@@ -1,6 +1,6 @@
 ---
 name: openrouter-models
-description: "Find and test free OpenRouter models. Lists available free models, tests their availability, and selects the best working model for code generation tasks. Use this before spawning agents to select cost-effective models."
+description: "Find and test free OpenRouter models — lists available free models, tests availability, and selects the best working model for code generation. Use before spawning agents to pick cost-effective models, or when asked which OpenRouter model to use."
 author: gastown
 version: 1.0.0
 ---

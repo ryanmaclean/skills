@@ -1,6 +1,6 @@
 ---
 name: rust-bsd-patches
-description: Patch Rust crates that fail to build on NetBSD aarch64 (ARM64)
+description: Patch Rust crates that fail to build on NetBSD aarch64 (ARM64). Use when cargo builds break on NetBSD, when a crate needs a BSD patch, or when cross-compiling Rust for aarch64 NetBSD.
 triggers:
   - netbsd rust build
   - cargo build netbsd

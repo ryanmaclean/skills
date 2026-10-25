@@ -1,6 +1,6 @@
 ---
 name: esp32-tang-bridge
-description: ESP32-C6 RISC-V UART-to-IRC bridge for Tang FPGA console. Build with ESP-IDF v5.3, flash via USB from studio. WiFi to fleet LAN, plaintext IRC to Ergo. Includes WireGuard support.
+description: ESP32-C6 RISC-V UART-to-IRC bridge for Tang FPGA console — ESP-IDF v5.3 build, USB flash from studio, WiFi to fleet LAN, plaintext IRC to Ergo, WireGuard support. Use when working on the Tang FPGA serial bridge, ESP32-C6 firmware, or UART-to-IRC plumbing.
 trigger: esp32, tang bridge, tang console, esp-idf, risc-v bridge, uart irc, tang-bridge
 ---
 

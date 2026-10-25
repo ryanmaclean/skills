@@ -1,6 +1,6 @@
 ---
 name: proveryay
-description: Automatic verification hook for sub-agent claims. Fires on SubagentStop, extracts structured <claims> blocks from agent reports, verifies each via fleet-eval probes in parallel, injects verdicts into Claude's context so claims cannot be trusted without proof. Reinforces the "claim -> proof" reflex.
+description: Automatic verification hook for sub-agent claims — extracts <claims> blocks from agent reports on SubagentStop, verifies each via fleet-eval probes in parallel, and injects verdicts into context. Use when wiring claim verification, debugging the hook, or when agents' reports need proof.
 trigger: verify agent claim, proveryay, automatic verification, hook, prove it, was that actually true, did it actually work, trust but verify
 ---
 

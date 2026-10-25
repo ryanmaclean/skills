@@ -1,6 +1,6 @@
 ---
 name: apple-silicon
-description: "Apple Silicon optimization for VMs, ML inference, and compression. Covers Metal GPU acceleration, MLX model inference, CoreML conversion, M-series zstd compression, Apple Virtualization Framework, and performance tuning."
+description: "Apple Silicon optimization for VMs, ML inference, and compression. Covers Metal GPU acceleration, MLX model inference, CoreML conversion, M-series zstd compression, Apple Virtualization Framework, and performance tuning. Use when working on macOS M-series performance, QEMU/VM setup, or squeezing more out of Apple hardware."
 author: gastown
 version: 1.0.0
 ---

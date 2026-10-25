@@ -1,9 +1,6 @@
 ---
 name: providers
-description: >
-  Unified AI provider quota monitor. Shows Claude Code, Codex CLI, and Gemini CLI
-  OAuth rate-limit utilization bars with reset countdowns. Reads credentials from
-  each tool's local auth files — no API keys required.
+description: Unified AI provider quota monitor — Claude Code, Codex CLI, and Gemini CLI OAuth rate-limit utilization bars with reset countdowns, read from local auth files (no API keys). Use when checking quota, rate limits, provider headroom, or why a provider is throttled.
 ---
 
 # providers — AI Quota Monitor

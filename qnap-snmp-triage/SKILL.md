@@ -1,6 +1,6 @@
 ---
 name: qnap-snmp-triage
-description: End-to-end QNAP SNMP monitoring triage across Datadog NDM, pup metrics, SSH reachability, UDP/161, and optional snmpwalk checks.
+description: End-to-end QNAP SNMP monitoring triage — Datadog NDM, pup metrics, SSH reachability, UDP/161, and optional snmpwalk checks. Use when QNAP/NAS SNMP metrics are missing, stale, or noisy in Datadog.
 ---
 
 # QNAP SNMP Triage

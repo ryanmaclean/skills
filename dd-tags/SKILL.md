@@ -1,6 +1,6 @@
 ---
 name: dd-tags
-description: Datadog unified service tagging best practices — env/service/version core tags, naming rules, and tag standards across APM traces, logs, and metrics.
+description: Datadog unified service tagging best practices — env/service/version core tags, naming rules, and tag standards across APM traces, logs, and metrics. Use when setting up DD_SERVICE/DD_ENV/DD_VERSION, normalizing tags, or auditing tag coverage.
 ---
 
 # Datadog Tagging Best Practices

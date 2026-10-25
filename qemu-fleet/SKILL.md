@@ -1,6 +1,6 @@
 ---
 name: qemu-fleet
-description: Manage QEMU virtual machines on the fleet (Apple Silicon + Pi nodes)
+description: Manage QEMU virtual machines on the fleet (Apple Silicon + Pi nodes). Use when creating, booting, snapshotting, or debugging QEMU VMs on fleet hosts.
 version: 1.0.0
 triggers:
   - qemu

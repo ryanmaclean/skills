@@ -1,10 +1,6 @@
 ---
 name: preflight
-description: >
-  Pre-dispatch quota check. Run before delegating tasks to Codex, Auto-Claude, or
-  any agent backend. Shows live utilization for all providers and recommends which
-  backend to use based on remaining quota. Warns when any provider is above 70%
-  and blocks dispatch recommendations when above 90%.
+description: Pre-dispatch quota check showing live utilization across providers (Codex, Auto-Claude, others), recommending the backend with the most headroom — warns above 70%, blocks above 90%. Use before delegating tasks, dispatching agents, or when asked what has capacity.
 triggers:
   - "before dispatch"
   - "check quota"

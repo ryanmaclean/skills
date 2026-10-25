@@ -1,8 +1,6 @@
 ---
 name: termframe
-description: >
-  Capture and render terminal output as SVG screenshots using termframe for
-  command output, remote sessions, and OpenCode reporting workflows.
+description: Capture and render terminal output as SVG screenshots using termframe — for command output, remote sessions, and OpenCode reporting workflows. Use when asked to screenshot a terminal, render ANSI to SVG, or produce terminal output images.
 ---
 
 # Termframe Skill

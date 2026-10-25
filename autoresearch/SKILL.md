@@ -1,6 +1,6 @@
 ---
 name: autoresearch
-description: Autonomous Goal-directed Iteration. Apply Karpathy's autoresearch principles to ANY task. Loops autonomously — modify, verify, keep/discard, repeat. Supports optional loop count via Claude Code's /loop command.
+description: Autonomous goal-directed iteration applying Karpathy's autoresearch loop — modify, verify, keep/discard, repeat. Use when the user wants a task iterated autonomously, says /autoresearch, /loop, hill-climb a goal, or asks for iterative self-improvement on code, prompts, or content.
 version: 1.3.3
 ---
 

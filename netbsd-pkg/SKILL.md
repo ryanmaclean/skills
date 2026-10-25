@@ -1,6 +1,6 @@
 ---
 name: netbsd-pkg
-description: NetBSD package management and Rust build setup on QEMU aarch64 VMs
+description: NetBSD package management and Rust build setup on QEMU aarch64 VMs. Use for pkg_add/pkgin on NetBSD ARM64, installing Rust toolchains, or preparing NetBSD build VMs.
 version: 1.0.0
 triggers:
   - netbsd

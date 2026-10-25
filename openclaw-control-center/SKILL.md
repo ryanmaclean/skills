@@ -1,6 +1,6 @@
 ---
 name: openclaw-control-center
-description: Local-first, security-first control center for RigFleet agents — visibility dashboard with readonly defaults, token attribution, collaboration tracing, and safe write operations.
+description: Local-first, security-first control center for RigFleet agents — visibility dashboard with readonly defaults, token attribution, collaboration tracing, and safe write operations. Use for RigFleet dashboards, token usage views, or control-center write ops.
 triggers:
   - rigfleet control center
   - rigfleet dashboard

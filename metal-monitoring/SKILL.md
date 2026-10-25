@@ -1,6 +1,6 @@
 ---
 name: "metal-monitoring"
-description: "Validate Apple Metal GPU telemetry in Datadog and verify DCGM shim ingestion across workstations."
+description: "Validate Apple Metal GPU telemetry in Datadog and verify DCGM shim ingestion across workstations. Use when GPU metrics look missing, stale, or inconsistent on Apple Silicon training hosts, or when checking the DCGM-shim pipeline."
 ---
 
 # Metal Monitoring

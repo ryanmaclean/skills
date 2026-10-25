@@ -1,12 +1,6 @@
 ---
 name: lower-bound-review
-description: >
-  Architecture review gate for Ryan's lower-bound systems research. Use before
-  proposing a new queue, scheduler, database, storage layer, FPGA block, RISC-V
-  core, ASIC function, lineage store, runtime, or cross-repo primitive. Forces
-  prior-art/research-index checks, lowest-layer ownership, BSD/no-Linux target,
-  permissive licensing, storage semantics, TEE-style trust boundaries, and a
-  statement of what layer the proposal deletes.
+description: Architecture review gate for lower-bound systems research. Use before proposing a new queue, scheduler, database, storage layer, FPGA block, RISC-V core, ASIC function, lineage store, runtime, or cross-repo primitive — forces prior-art checks, lowest-layer ownership, BSD targets, permissive licensing, and a statement of what layer the proposal deletes.
 ---
 
 # lower-bound-review — delete layers before adding them

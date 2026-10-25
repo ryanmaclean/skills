@@ -1,6 +1,6 @@
 ---
 name: searxng
-description: Use the local SearXNG instance when WebSearch is rate-limited, geo-blocked, or returns no results.
+description: Use the local SearXNG instance (searxng.local) for web searches when WebSearch is rate-limited, geo-blocked, or returns no results — also for fleet-internal search via JSON API.
 ---
 
 # searxng — Local Search Fallback

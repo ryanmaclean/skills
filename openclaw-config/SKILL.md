@@ -1,6 +1,6 @@
 ---
 name: openclaw-config
-description: Manage RigFleet bot configuration - channels, agents, security, and autopilot settings
+description: Manage RigFleet bot configuration — channels, agents, security, and autopilot settings. Use when changing openclaw/RigFleet bot channels, agent assignments, or autopilot behavior.
 version: 3.0.0
 ---
 
