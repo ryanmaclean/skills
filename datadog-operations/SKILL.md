@@ -1,5 +1,5 @@
 ---
-name: datadog
+name: datadog-operations
 description: Query Datadog APM traces, logs, metrics, SLOs, security signals, and service catalog. Create monitors, dashboards, and synthetic tests. Manage incidents and workflows. Use when investigating performance issues, searching logs, checking SLOs, analyzing costs, or automating Datadog operations.
 ---
 

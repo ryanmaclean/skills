@@ -1,3 +1,8 @@
+---
+name: asustor-nas
+description: Manage the Asustor AS6510T NAS (anas, 10.0.3.9) — Docker containers, networking, storage, ADM configuration, and fleet agent deployment. Use for asustor, anas, or AS6510T operations including the /24-vs-/23 route fix.
+---
+
 # Asustor NAS (ANAS) Management Skill
 
 ## When to Use

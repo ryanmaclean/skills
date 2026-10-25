@@ -1,3 +1,8 @@
+---
+name: qcli
+description: Qdrant CLI for fleet agents — wraps the Qdrant REST API with built-in embedding via Ollama snowflake-arctic-embed2. Use for vector search, collection browsing, upserts, and purges across fleet Qdrant collections.
+---
+
 # qcli
 
 Qdrant CLI for fleet agents. Wraps Qdrant REST API with built-in embedding via ollama snowflake-arctic-embed2.

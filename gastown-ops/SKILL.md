@@ -1,3 +1,8 @@
+---
+name: gastown-ops
+description: Manage Gas Town agent orchestration, bead lifecycle, Kafka messaging, Airflow DAGs, and multi-rig coordination. Use for gt operations, polecat management, stuck beads, Kafka topics, and Tundra Dome workflows.
+---
+
 # Gas Town Operations Skill
 
 Manage Gas Town agent orchestration, bead lifecycle, Kafka messaging, Airflow DAGs, and multi-rig coordination.

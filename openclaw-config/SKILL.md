@@ -1,5 +1,5 @@
 ---
-name: rigfleet-config
+name: openclaw-config
 description: Manage RigFleet bot configuration - channels, agents, security, and autopilot settings
 version: 3.0.0
 ---

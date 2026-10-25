@@ -1,4 +1,9 @@
-# qnas_docker
+---
+name: qnas-docker
+description: Docker operations on qnas (QNAP NAS at 10.0.2.35). Docker is not in PATH — use the full container-station binary path for ps, run, exec, logs, pull, and rm over SSH.
+---
+
+# qnas-docker
 
 Use for all Docker operations on qnas (QNAP NAS at 10.0.2.35).
 
