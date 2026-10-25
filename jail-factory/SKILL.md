@@ -10,9 +10,10 @@ Host: `root@fbryz3070.local` (FreeBSD 15.0-p11, 128GB, NVIDIA 3070, pup+dd agent
 ## Layout
 
 - `jails` — 40G file-backed zpool at `/jails.img` (host is UFS; destroy pool + rm img to undo)
-- `jails/golden@v1` — base snapshot: FreeBSD 15.0 + nu 0.116.1 (cargo-built — pkg binary needs FBSD_1.9), jq, git, pcre2
+- `jails/golden@v2` — base snapshot: FreeBSD 15.0 + nu 0.116.1 (cargo-built — pkg binary needs FBSD_1.9), jq, git, pcre2, **claude-code 2.1.283** (linuxulator), codex (cargo-built, compiling)
 - `jails/f-<card>` — per-card clone, mounted at `/jails/f-<card>`
-- `/root/jail-factory/factory-run.nu` — lifecycle: clone → nullfs mounts → `jexec nu` → destroy → propagate exit code
+- `/root/jail-factory/factory-run.nu` — lifecycle: clone → nullfs+linprocfs/linsysfs/fdescfs mounts → `jexec nu` → destroy → propagate exit code
+- bop adapter: `bop-bench-wt/adapters/jail.nu` (stages workdir via scp, `BOP_JAIL_CMD` sets inner command)
 
 ## Usage
 
@@ -45,14 +46,17 @@ rate-limit (EX_TEMPFAIL) so the provider chain rotates.
 
 ## Gotchas
 
-- nushell from pkg does NOT run on this base (needs `FBSD_1.9` symbols); the golden uses the cargo-built 0.116.1 at `/usr/local/bin/nu`
+- nushell + codex from pkg do NOT run on this base (built for `FBSD_1.9`, p11 ships `FBSD_1.8`) — both are cargo-built instead
+- `claude` runs under Linux emulation: jail needs `linux=new` + linprocfs/linsysfs mounts + `fdescfs -o linrdlnk` at `/compat/linux/dev/fd`, all mounted host-side (jail lacks mount perms for them)
 - `jj` is not packaged for FreeBSD — git only inside jails
-- Always `umount -f` dev/nullfs mounts before `zfs destroy` or the dataset stays busy
-- `freebsd-update` refuses non-interactive runs; use `freebsd-update cron` (has random sleep) or interactive
+- Always `umount -f` ALL mounts (incl. linux fs) before `zfs destroy` or the dataset stays busy
+- `freebsd-update` refuses non-interactive runs; use `freebsd-update cron` (random sleep) or interactive
 
 ## Roadmap
 
-- [ ] `adapters/jail.nu` in bop repo calling this over ssh
+- [x] `adapters/jail.nu` in bop repo calling this over ssh
+- [x] claude-code in golden via linuxulator
+- [ ] codex cargo build finishing (`/tmp/codex-build.log` on host)
 - [ ] Per-card env file (credential scoping — no inherited DD keys)
 - [ ] `rctl` limits: cpu/mem/pids per card
 - [ ] vnet networking instead of ip4=inherit
